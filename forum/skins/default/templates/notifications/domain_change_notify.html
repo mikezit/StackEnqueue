@@ -1,0 +1,30 @@
+{% load i18n extra_tags email_tags %}
+
+{% declare %}
+    prefix = html.mark_safe(smart_str(settings.EMAIL_SUBJECT_PREFIX))
+    app_name = smart_unicode(settings.APP_SHORT_NAME)
+    app_url = settings.APP_URL
+{% enddeclare %}
+
+{% email %}
+    {% subject %}{{ prefix }}StackEnqueue备案完成{% endsubject %}
+    {% htmlcontent notifications/base.html %}
+        {% declare %}
+        {% enddeclare %}
+为了提供国内不同网络更快的访问速度，前段时间我们进行了国内备案，并停止了网站的访问。并对此深表歉意，现在我们很高兴的告知您，StackEnqueue备案已经结束，现在已经能正常访问了。<br><br>
+在这段时间我们也没有闲着，并为网站进行了很多的修正，我们增加了标签的合作编辑功能，让用户可以自己上传头像，并且解决了一些bug。<br><br><br>
+欢迎您对网站的任何反馈，以使我们能做的更好！
+{% endhtmlcontent %}
+{% textcontent notifications/base_text.html %}
+{% blocktrans %}This is a brief of what's going on the {{ app_name }} community since our last update.{% endblocktrans %}
+
+{% if new_member_count %}
+{% if show_all_users %}
+{% blocktrans %}There are {{ new_member_count }} new members in the community. {{ new_member_links }} were the most active so far.{% endblocktrans %}
+{% else %}
+{% blocktrans %}{{ new_member_links }} have joined the {{ app_name }} community.{% endblocktrans %}
+{% endif %}
+{% endif %}
+
+{% endtextcontent %}
+{% endemail %}

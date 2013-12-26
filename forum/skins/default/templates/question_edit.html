@@ -1,0 +1,210 @@
+{% extends "edit_base.html" %}
+<!-- question_edit.html -->
+{% load i18n %}
+{% load extra_tags %}
+{% block title %}{% spaceless %}{% trans "Edit question" %}{% endspaceless %}{% endblock %}
+{% block forejs %}
+        <script type='text/javascript' src='{% media  "/media/js/wmd/showdown.js" %}'></script>
+        <script type='text/javascript' src='{% media  "/media/js/wmd/wmd.js" %}'></script>
+        <script type='text/javascript' src='{% media  "/media/js/tag_edit.js" %}'></script>
+        <link rel="stylesheet" type="text/css" href="{% media  "/media/js/wmd/wmd.css" %}" />
+        <script src="{% media "/media/js/osqa.ask.js" %}" type="text/javascript"></script>
+        <script type="text/javascript">
+		//todo move javascript out        
+        $().ready(function(){
+            $("#nav_questions").attr('className',"on");
+            $('#editor').TextAreaResizer();
+            
+
+            //toggle preview of editor
+            var display = true;
+            var txt = "[{% trans "hide preview" %}]";
+            $('#pre-collapse').text(txt);
+            $('#pre-collapse').bind('click', function(){
+                txt = display ? "[{% trans "show preview" %}]" : "[{% trans "hide preview" %}]";
+                display = !display;
+                $('#previewer').toggle();
+                $('#pre-collapse').text(txt);
+            });
+            
+            //Tags autocomplete action
+            var tagInput = $("#tagnames");
+            initTagRenderer("".split(" "), "".split(" "));
+            StackPointer.tagEditor(tagInput);
+
+        	$("#id_tags").autocomplete("{% url matching_tags %}", {
+        	matchContains: true,
+                max: 20,
+                multiple: true,
+                multipleSeparator: " ",
+                highlightItem: true,
+                scroll: true,
+                scrollHeight: 300,
+        		/*formatItem: function(row, i, max) {
+        			return row.n + " ("+ row.c +")";
+        		},
+                formatResult: function(row, i, max){
+                    return row.n;
+                }*/
+                formatItem: function(row, i, max, value) {
+                    return row[1] + " (" + row[2] + ")";
+                },
+
+                formatResult: function(row, i, max, value){
+                    return row[1];
+                }
+                
+            });         
+
+            $('#id_revision').unbind().change(function(){
+                $("#select_revision").click();
+            });
+
+            init = $("textarea#editor")[0].value;
+
+            title = $("input#id_title")[0].value;
+            body = $("textarea#editor")[0].value;
+            tag = $("input#id_tags")[0].value;
+        });
+
+        function submitClicked(e, f) {
+            if(!(browserTester('chrome') || browserTester('safari'))) {
+                $("input.submit")[0].disabled=true;
+                $("input.submit")[1].disabled=true;
+            }
+            window.removeEventListener('beforeunload', beforeUnload, true);
+            if (f) {
+                f.submit();
+            }
+        }
+
+        function beforeUnload(e) {
+            if($("input#id_title")[0].value != title || $("textarea#editor")[0].value != body || $("input#id_tags")[0].value != tag) {
+                 return yourWorkWillBeLost(e);
+            }
+        }
+        window.addEventListener('beforeunload', beforeUnload, true);
+
+        var init = "";
+        var title = "";
+        var body = "";
+        var tag = "";
+        </script>
+{% endblock %}
+        
+{% block content %}
+<!--
+<div id="main-bar" class="headNormal">
+    {% block edittype %}{% trans "Edit question" %}{% endblock %} [<a href="{{ question.get_absolute_url }}">{% trans "back" %}</a>]
+</div>
+-->
+<div id="main-body" class="ask-body">
+    <div id="askform">
+      {%if is_suggestion%}
+      <div class="module newuser">
+	<p>你没有 <a href="/privileges/edit-questions-and-answers">编辑权限</a> ，你的编辑将会放在一个队列里，直到被前者评审。</p>
+	<p>我们欢迎所有有帮助的编辑，但是请保证它们是正确的。除非不得以，请避免琐碎的，细微的编辑。</p>
+      </div>
+      {%endif%}
+        <form id="fmedit" action="" method="post" >
+	      <table style="width: 668px;">
+		<tbody>
+		  <tr>
+		    <td class="ask-title">
+		      <label for="id_revision" ><strong>{% trans "revision" %}</strong>
+		    </td>
+		    <td>
+		      <div style="vertical-align:middle;text-align:right">
+			{{ revision_form.revision }} <input type="submit" style="display:none;" id="select_revision" name="select_revision" value="{% trans "select revision"%}">
+            </div> 
+		    </td>
+		</tbody>
+	      </table>
+            {% if revision_form.revision.errors %}{{ revision_form.revision.errors.as_ul }}{% endif %}
+
+
+            <div class="form-item">
+	      <table style="width: 668px;">
+		<tbody>
+		  <tr>
+		    <td class="ask-title">
+                      <label for="id_title" ><strong>{{ form.title.label_tag }}</strong></label>
+		    </td>
+		    <td>
+                      {{ form.title }}
+		    </td>
+		</tbody>
+	      </table>
+	      {{ form.title.errors }}  
+              <!--<div class="title-desc">
+                {{ form.title.help_text }}
+                </div> -->    
+            </div>
+            <div class="form-item">
+	      <div class="post-editor" id="post-editor">
+              <div id="wmd-button-bar" class="wmd-panel"></div>
+                {{ form.text }}
+                <span class="form-error">{{ form.text.errors }}</span>
+                <div class="preview-toggle">
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <span id="pre-collapse" title="{% trans "Toggle the real time Markdown editor preview" %}">{% trans "toggle preview" %}</span>
+                            </td>
+                            <td style="text-align: right;" id="editor-metrics"></td>
+                            {% if settings.WIKI_ON %}
+                            <td style="text-align:right;">
+                                {{ form.wiki }} <span style="color:#000;cursor:help" title="{{form.wiki.help_text}}">{{ form.wiki.label_tag }} </span>
+                            </td>
+                            {% endif %}
+                        </tr>
+                    
+                    </table>   
+                </div>
+                <div id="previewer" class="wmd-preview"></div>
+		</div>
+            </div>
+
+           <div class="form-item edit-tags">
+                <strong >{{ form.tags.label_tag }}</strong>
+		<span class="form-error"></span><br/>
+		<div class="tag-editor" style="height: 28px;opacity: 1;position: relative;width:660px;z-index: 1;margin:0;"  >
+                {{ form.tags }}
+		</div>
+		{{ form.tags.errors }}
+            </div>
+           <div class="title-desc">
+             {{ form.tags.help_text }}
+           </div>
+
+	   <div class="form-item edit-tags">
+            <label><strong>{{ form.summary.label_tag }}</strong></label>
+	   </div>
+            {{ form.summary }}  {{ form.summary.errors }}
+            <div class="title-desc">
+                {{ form.summary.help_text }}
+            </div>
+            
+            {% if form.recaptcha %}
+            <div class="question-captcha" style="float: left">
+            	{{ form.recaptcha.errors }}
+            	{{ form.recaptcha }}
+            </div>
+            <div class="clear"></div>
+            {% endif %}
+            
+            <div class="error" ></div>
+            <input type="button" value="{% trans "Save edit" %}" class="submit" onclick="submitClicked(event, this.form)" />
+            <input type="button" value="{% trans "Cancel" %}" class="submit" onclick="submitClicked(event, null); history.back(-1);" />
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+{% include "question_edit_tips.html" %}
+{% endblock %}
+
+{% block endjs %}
+{% endblock %}
+<!-- end question_edit.html -->

@@ -1,0 +1,19 @@
+{% extends "question_base.html" %}
+{% load i18n extra_tags extra_filters markup%}
+{% block title %}{% spaceless %}{% trans "How to ask" %}{% endspaceless %}{% endblock %}
+{% block topcontent %}        
+<div class="question-header">
+    <h1>怎样来提问</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+    {{settings.ASK_TIPS_PAGE_TEXT|markdown:"settingsparser" }}
+    <form id="theForm" method="get" action="/questions/ask">
+        <input type="checkbox" name="advised" id="advised" value="advised" checked="true">
+        <label for="advised">&nbsp;知道了，我在提问的时候会注意这些。</label>
+        <div style="text-align:right; width:100%;" id="proceed">
+          <input type="submit" value="继续&raquo;">
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends "base_content.html" %}
+<!-- question_edit.html -->
+{% load i18n %}
+{% load extra_tags %}
+{% load user_tags %}
+{% load extra_filters %}
+{% block title %}{% spaceless %}{% trans "Edit user profile" %}{% endspaceless %}{% endblock %}
+{% block forejs %}
+<script type='text/javascript' src='{% media  "/media/js/jquery-ui.min.js" %}'></script>
+<script type='text/javascript' src='{% media  "/media/js/wmd/showdown.js" %}'></script>
+<script type='text/javascript' src='{% media  "/media/js/wmd/wmd.js" %}'></script>
+<link rel="stylesheet" type="text/css" href="{% media  "/media/js/wmd/wmd.css" %}" />
+<link rel="stylesheet" href="{% media "/media/style/jquery-ui.css" %}" type="text/css" media="all" />
+        <script type="text/javascript">
+		//todo move javascript out        
+        $().ready(function(){
+            $("#nav_questions").attr('className',"on");
+            $('#editor').TextAreaResizer();
+
+  $("#id_birthday").datepicker({
+  changeMonth: true,
+  changeYear: true,
+  dateFormat: 'yy-mm-dd',
+  minDate: null,
+  maxDate: '0M 0D',
+  yearRange: '1920:2010'
+  });
+
+  $("#cancel").bind('click', function(){history.go(-1);})
+
+            //toggle preview of editor
+            var display = true;
+            var txt = "[{% trans "hide preview" %}]";
+            $('#pre-collapse').text(txt);
+            $('#pre-collapse').bind('click', function(){
+                txt = display ? "[{% trans "show preview" %}]" : "[{% trans "hide preview" %}]";
+                display = !display;
+                $('#previewer').toggle();
+                $('#pre-collapse').text(txt);
+            });
+            
+            //Tags autocomplete action
+        	$("#id_tags").autocomplete("{% url matching_tags %}", {
+        		matchContains: true,
+                max: 20,
+                multiple: true,
+                multipleSeparator: " ",
+                highlightItem: true,
+                scroll: true,
+                scrollHeight: 300,
+        		/*formatItem: function(row, i, max) {
+        			return row.n + " ("+ row.c +")";
+        		},
+                formatResult: function(row, i, max){
+                    return row.n;
+                }*/
+                formatItem: function(row, i, max, value) {
+                    return row[1] + " (" + row[2] + ")";
+                },
+
+                formatResult: function(row, i, max, value){
+                    return row[1];
+                }
+                
+            });         
+
+            $('#id_revision').unbind().change(function(){
+                $("#select_revision").click();
+            });
+
+            init = $("textarea#editor")[0].value;
+
+            title = $("textarea#editor-tag")[0].value;
+            body = $("textarea#editor")[0].value;
+            //tag = $("input#id_tags")[0].value;
+        });
+
+        function submitClicked(e, f) {
+            if(!(browserTester('chrome') || browserTester('safari'))) {
+                $("input.submit")[0].disabled=true;
+                $("input.submit")[1].disabled=true;
+            }
+            window.removeEventListener('beforeunload', beforeUnload, true);
+            if (f) {
+                f.submit();
+            }
+        }
+
+        function beforeUnload(e) {
+            if($("input#id_title")[0].value != title || $("textarea#editor")[0].value != body || $("input#id_tags")[0].value != tag) {
+                 return yourWorkWillBeLost(e);
+            }
+        }
+        window.addEventListener('beforeunload', beforeUnload, true);
+
+        var init = "";
+        var title = "";
+        var body = "";
+        var tag = "";
+        </script>
+{% endblock %}
+{% block content %}
+<div id="main-body" class="ask-body">
+  <div class="subheader" >
+    <h1> {{user.decorated_name}} > 编辑</h1>
+    <div class="sub-header-links fr">
+      {% if can_view_private %}
+      {% user_menu request.user view_user %}
+      {%endif%}
+    </div>
+  </div>
+  <div id="left" style="float:left;width:180px;margin-top:10px">
+    {% if user.email %}
+    {% gravatar user 128 %}
+    {% else %}
+    <img src="{% media  "/media/images/nophoto.png" %}">
+      {% endif %}
+      <div style="padding:20px 0 0 20px;font-weight:bold;font-size:150%">
+        <a href="{% url edit_gravatar user.id %}" 
+	   title=" {% trans "image associated with your email address" %}">{% trans "gravatar" %}</a>
+      </div>
+    </div>
+    <div id="askform">
+      <form id="fmedit" action="" method="post" style="width:100%;margin-top:10px" >
+
+      <h2>{% trans "Registered user" %}</h2>
+      <table class="user-details">
+        <tr>
+          <th width="100px"></th>
+          <th></th>
+        </tr>
+        <tr style="height:35px">
+	  <td>{% trans "Screen Name" %}:</td>
+	  <td>
+	    {% if form.display_name %}
+	    {{ form.display_name }} 
+	    <span class="form-error"></span> 
+	    {{ form.display_name.errors }}
+	    {% else %}
+	    {{ user.display_name }}
+	    {% endif %}
+	  </td>
+	</tr>
+        
+	<tr style="height:35px">
+	  <td>{{ form.email.label_tag }}:</td>
+	  <td>{{ form.email }} <span class="form-error"></span> {{ form.email.errors }} </td>
+	</tr>
+        <tr style="height:35px">
+	  <td></td>
+	  <td class="title-desc">{{ form.email.help_text }}</td>
+	</tr>
+        <tr style="height:35px">
+	  <td>{{ form.realname.label_tag }}:</td>
+	  <td>{{ form.realname }} <span class="form-error"></span> {{ form.realname.errors }} </td>
+	</tr>
+        <tr style="height:35px">
+	  <td>{{ form.website.label_tag }}:</td>
+	  <td>{{ form.website }} <span class="form-error"></span> {{ form.website.errors }} </td>
+	</tr>
+        <tr style="height:35px">
+	  <td>{{ form.city.label_tag }}:</td>
+	  <td>{{ form.city }} <span class="form-error"></span> {{ form.city.errors }} </td>
+	</tr>
+        <tr style="height:35px">
+	  <td>{{ form.birthday.label_tag }}:</td>
+	  <td>{{ form.birthday }} <span class="form-error"></span> {{ form.birthday.errors }} </td>
+	</tr>
+	<tr>
+	  <td style="vertical-align:top">{{ form.about.label_tag }}:</td>
+	  <td>
+            <div class="form-item">
+	      <div class="post-editor" id="post-editor">
+              <div id="wmd-button-bar" class="wmd-panel"></div>
+              {{ form.about }}
+              <span class="form-error"></span>
+	      {{ form.about.errors }}  
+              <div class="preview-toggle">
+                <table width="100%">
+                  <tr>
+                    <td>
+                      <span id="pre-collapse" title="{% trans "Toggle the real time Markdown editor preview" %}">{% trans "toggle preview" %}</span>
+                    </td>
+                    <td style="text-align: right;" id="editor-metrics"></td>
+                  </tr>
+                    
+                </table>   
+              </div>
+              <div id="previewer" class="wmd-preview"></div>
+	      </div>
+            </div>
+	    </td>
+	</tr>
+	</table>
+
+      <div class="error" ></div>
+      <div style="margin:30px 0 60px 268px">
+	<input type="button" value="{% trans "Save edit" %}" class="submit" onclick="submitClicked(event, this.form)" />
+	<input type="button" value="{% trans "Cancel" %}" class="submit" onclick="submitClicked(event, null); history.back(-1);" />
+      </div>
+      </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+{% include "sidebar/tag_wiki_tips.html" %}
+{% endblock %}
+
+{% block endjs %}
+{% endblock %}
+<!-- end question_edit.html -->

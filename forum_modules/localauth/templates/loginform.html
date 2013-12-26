@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<fieldset id='local_login_fs'>
+  <table>
+    <tr>
+        <td>
+             <label for="id_username">{% trans 'Login name' %}</label>
+        </td>
+        <td>
+             <input id="id_username" type="text" class="required login" name="username" maxlength="30" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+              <label for="id_password">{% trans 'Password' %}</label>
+        </td>
+        <td>
+             <input id="id_password" type="password" class="required login" name="password" maxlength="128" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input id="blogin" name="blogin" type="submit" value="{% trans 'Login' %}" />
+        </td>
+        <td style="padding-top:10px">
+          <a class="big strong" href="{% url auth_local_register %}">{% trans 'Create account' %}</a><span>&nbsp;|&nbsp;</span><a href="{% url auth_request_tempsignin %}">{% trans 'Forgot your password?' %}</a>
+        </td>
+    </tr>
+  </table>
+</fieldset>

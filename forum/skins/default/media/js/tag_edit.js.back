@@ -1,0 +1,499 @@
+"use strict";
+
+//jquery caret extension
+﻿(function(k,e,i,j){k.fn.caret=function(b,l){var a,c,f=this[0],d=k.browser.msie;if(typeof b==="object"&&typeof b.start==="number"&&typeof b.end==="number"){a=b.start;c=b.end}else if(typeof b==="number"&&typeof l==="number"){a=b;c=l}else if(typeof b==="string")if((a=f.value.indexOf(b))>-1)c=a+b[e];else a=null;else if(Object.prototype.toString.call(b)==="[object RegExp]"){b=b.exec(f.value);if(b!=null){a=b.index;c=a+b[0][e]}}if(typeof a!="undefined"){if(d){d=this[0].createTextRange();d.collapse(true);
+d.moveStart("character",a);d.moveEnd("character",c-a);d.select()}else{this[0].selectionStart=a;this[0].selectionEnd=c}this[0].focus();return this}else{if(d){c=document.selection;if(this[0].tagName.toLowerCase()!="textarea"){d=this.val();a=c[i]()[j]();a.moveEnd("character",d[e]);var g=a.text==""?d[e]:d.lastIndexOf(a.text);a=c[i]()[j]();a.moveStart("character",-d[e]);var h=a.text[e]}else{a=c[i]();c=a[j]();c.moveToElementText(this[0]);c.setEndPoint("EndToEnd",a);g=c.text[e]-a.text[e];h=g+a.text[e]}}else{g=
+f.selectionStart;h=f.selectionEnd}a=f.value.substring(g,h);return{start:g,end:h,text:a,replace:function(m){return f.value.substring(0,g)+m+f.value.substring(h,f.value[e])}}}}})(jQuery,"length","createRange","duplicate");
+
+StackPointer.tagEditor=function(rel_input,R,l){
+    var g;
+
+    if(typeof l==="undefined"){
+	try{
+	    g=rel_input.is(":focus")
+	}catch(D){
+	    g=false
+	}
+    }else{
+	g=l
+    }
+
+    function x(){
+	g=true
+    }
+
+    rel_input.bind("focus",x);
+    if(!rel_input.is(":visible")){
+	R=R||0;
+	if(R<3){
+	    setTimeout(function(){rel_input.unbind("focus",x);StackPointer.tagEditor(rel_input,R+1,g)},300);
+	    return
+	}else{
+	    rel_input.unbind("focus",x);
+	    StackPointer.debug.log("tag box is invisible, couldn't start tag editor");
+	    return
+	}
+    }
+    rel_input.unbind("focus",x);
+    var w=rel_input.innerWidth();
+    var P=((w-40)/3)|0;
+    //add tag editor
+    var tag_editor=$("<div class='tag-editor' />").css("width",w).insertAfter(rel_input);
+    rel_input.hide();
+    var test_tag=$("<span class='post-tag'>test</span>").appendTo(tag_editor);
+    var tag_eidtor_ih=tag_editor.innerHeight();
+    test_tag.remove();
+    tag_editor.css("height",tag_eidtor_ih);
+    var pre_tags_container=$("<span />").appendTo(tag_editor);
+    var input_box=$("<input type='text' id='id_tags' tabIndex='0'/>").appendTo(tag_editor).val(rel_input.val()+" ");
+    var table_index=rel_input.attr("tabIndex");
+    if(table_index){
+	input_box.attr("tabIndex",table_index)
+    }
+    var end_tag_container=$("<span />").appendTo(tag_editor);
+    var J=false;
+    input_box.focus(function(){
+	g=true;
+	var e=StackPointer.tagEditor.requiredTags;
+	if(e&&B()){
+	    s(StackPointer.tagEditor.requiredTags)
+	}
+    });
+    input_box.blur(function(){
+	g=false;
+	setTimeout(function(){
+	    if(!J){
+		remove_suggest();
+		flash_tags()
+	    }},0)
+    });
+    rel_input.focus(function(){input_box.focus()});
+    input_box.keydown(on_text_input);
+    input_box.bind("keydown paste click change",function(e){setTimeout(function(){flash_tags()},0)});
+    tag_editor.delegate(".post-tag","click",function(S){
+	var e=$(this);
+	if($(S.target).hasClass("delete-tag")){
+	    e.text("")
+	}
+	click_node(e);
+	flash_tags()
+    });
+
+    tag_editor.click(
+	function(e){
+	    if(e.target!==this){
+		return
+	    }
+	    click_node("");
+	    flash_tags()
+	}
+    );
+
+    function createtag(S,bare){
+	var e=window.tagRendererRaw(S),U=e.replace(/<(\/?)a/g,"<$1span").replace(/href='[^>]*/,""),tag=$(U);//a to span ,del href attr
+	if(!bare){
+	    tag.append('<span class="delete-tag" title="remove this tag"></span>')
+	}
+	return tag
+    }
+
+    function get_input_tags(){
+	var tagstr =pre_tags_container.find(".post-tag").map(function(index,element){return $(element).text()}).get().join(" ");
+	if(tagstr.length){
+	    tagstr+=" "
+	}
+	var end_tags=end_tag_container.find(".post-tag").map(function(index,element){return $(element).text()}).get().join(" ");
+	if(end_tags.length&&input_box.val().length){
+	    end_tags=" "+end_tags
+	}
+	return{
+	    text:tagstr+input_box.val()+end_tags,
+	    lengthBeforeInput:tagstr.length
+	}
+    }
+
+    function B(){
+	var e=input_box.val();
+	return(e===""||e===" ") && pre_tags_container.add(end_tag_container).children().filter(function(){return !/^\s*$/.test($(this).text())}).length===0
+    }
+
+    function select_in_bare_tags(){
+	var e=input_box.caret();
+	if(!pre_tags_container.add(end_tag_container).find(".post-tag").length){
+	    return
+	}
+	var S=get_input_tags();
+	input_box.val(S.text);
+	pre_tags_container.empty();
+	end_tag_container.empty();
+	input_box.caret(e.start+S.lengthBeforeInput,e.end+S.lengthBeforeInput);
+	remove_suggest()
+    }
+
+    function sanitizeAndSplitTags(e,a){
+	for(var e=$.trim(e).replace(/([A-Za-z0-9])\+(?=[A-Za-z0-9])/g,"$1 "),c=e.split(/[\s|,;]+/),k=[],j=0;j<c.length;j++){
+	    var g=c[j].toLowerCase().replace(/_/g,"-"),
+	    //g=g.replace(RegExp("[^a-z0-9.#+"+(a?"*":"")+"-]","g"),""),
+	    g=g.replace(/^[#+-]+/,""),
+	    g=g.replace(/[.-]+$/,"");
+	    0<g.length&&-1==$.inArray(g,k)&&k.push(g)
+	}
+	return k
+    }
+    
+    function flash_tags(full){
+	if(J){return}
+
+	var select_text;
+
+	// get select text
+	if(full){ //full
+	    select_text={start:input_box.val().length,end:input_box.val().length}
+	}else{ //caret
+	    //get selected region
+	    select_text=input_box.caret()
+	}
+
+	if(select_text.start==-1){
+	    select_text.start=select_text.end=0
+	}
+
+	// has select text
+	if(select_text.start!==select_text.end){
+	    select_in_bare_tags();
+	    set_input_width();
+	    return
+	}
+
+	// has no selected text,just a cursor
+	var pre_str=input_box.val().substr(0,select_text.start);//pre cursor
+	var tail_str=input_box.val().substr(select_text.start);//beyond cursor
+
+	var taglist=(pre_str+"?").split(/[,;\s]+/);//split to tags,[,;\s]is splitor
+	if(taglist[taglist.length-1]==="?"){
+	    taglist[taglist.length-1]=""//no pre_str , or input such as [,,,,,;;]
+	}else{
+	    taglist[taglist.length-1]=taglist[taglist.length-1].slice(0,-1) 
+	}
+
+	var tail_tag_list=tail_str.split(/[,;\s]+/);
+	var current_tag_string=taglist.pop(); // get last tag string
+	var T=current_tag_string.length; 
+
+	current_tag_string += tail_tag_list.shift(); // remove the first tag string of tail tags
+	taglist=sanitizeAndSplitTags(taglist.join(" "));
+	tail_tag_list=sanitizeAndSplitTags(tail_tag_list.join(" "));
+
+	var i;
+	for(i=0;i<taglist.length;i++){
+	    createtag(taglist[i]).appendTo(pre_tags_container)
+	}
+
+	for(i=0;i<tail_tag_list.length;i++){
+	    createtag(tail_tag_list[i]).appendTo(end_tag_container)
+	}
+
+	if(current_tag_string!==input_box.val()){
+	    input_box.val(current_tag_string)
+	}
+
+	tag_editor.find(".post-tag").filter(
+	    function(){
+		return/^\s*$/.test($(this).text())
+	    }
+	).remove();
+
+	rel_input.val(get_input_tags().text);
+
+	if(g){
+	    input_box.caret(T,T);
+	    a()
+	}
+	set_input_width()
+    }
+
+    function click_node(edit_node,S){
+	var current_tag,value;
+	if(typeof edit_node==="string"){ // click on string
+	    value=edit_node
+	}else{ // click on tag
+	    if(!edit_node.length){
+		return // empty tag
+	    }else{
+		current_tag=edit_node;
+		value=current_tag.text()
+	    }
+	}
+
+	createtag(input_box.val()).appendTo(pre_tags_container);
+	input_box.val(value); // set inputbox
+
+	if(current_tag){
+	    var pre_tags=$($.unique(current_tag.prevAll(".post-tag").get()));
+	    current_tag.nextAll(".post-tag").prependTo(end_tag_container);
+	    pre_tags.appendTo(pre_tags_container);
+	    current_tag.remove()
+	}else{
+	    end_tag_container.find(".post-tag").appendTo(pre_tags_container)
+	}
+	input_box.focus();
+	if(S){
+	    input_box.caret(0,0)
+	}
+    }
+
+    var input_width_cache={};
+
+    function input_box_width(S){
+	var e=S.val(),U="c_"+e;
+	if(U in input_width_cache){
+	    return input_width_cache[U]
+	}
+	var V=$("<span />").css("font-family",S.css("font-family"));
+	V.text(S.val());
+	V.insertAfter(S);
+	var width=V.innerWidth();
+	V.remove();
+	input_width_cache[U]=width;
+	return width
+    }
+
+    var O=0;
+    function G(e){
+	if(e===O){
+	    return
+	}
+	pre_tags_container.add(input_box).add(end_tag_container).css({position:"relative",left:e});
+	O=e
+    }
+
+    function set_input_width(){
+	var S=input_box_width(input_box)+19,e=pre_tags_container.outerWidth();
+	if(!end_tag_container.children().length){S=Math.max(S,w-e-8)}
+	input_box.css("width",S);
+	if(e+O>0&&e+O+S<w){return}
+	if(e+S<w){G(0);return}
+	G(-e+(w-S)/2)
+    }
+
+    //     #       $       %       &       '       (            
+    var j={35:true,36:true,37:true,38:true,39:true,40:true};
+
+    var L;
+    function d(){
+	L=true;
+	setTimeout(function(){L=false},0)
+    }
+
+    function on_text_input(U){
+	if((U.shiftKey&&j[U.which])||(U.ctrlKey&&U.which===65)){
+	    select_in_bare_tags();
+	    return true
+	}
+	var V=input_box.caret().start,T=V===input_box.val().length,e=V===0,W,S;
+	switch(U.which){
+	case 37:
+	    if(!e){return true}
+	    click_node(pre_tags_container.find(".post-tag:last"));
+	    return false;
+	    break;
+	case 39:
+	    if(!T){return true}
+	    click_node(end_tag_container.find(".post-tag:first"),true);
+	    return false;
+	    break;
+	case 8://Backspace
+	    if(!e){return true}
+	    W=pre_tags_container.find(".post-tag:last");
+	    if(!W.length){return}
+	    input_box.val(W.text()+input_box.val());
+	    input_box.caret(W.text().length+V);
+	    W.remove();
+	    return false;
+	    break;
+	case 46://.
+	    if(!T){return true}
+	    S=end_tag_container.find(".post-tag:first");
+	    if(!S.length){return}
+	    input_box.val(input_box.val()+S.text());
+	    input_box.caret(V,V);
+	    S.remove();
+	    return false;
+	    break;
+	case 36://$
+	    W=pre_tags_container.find(".post-tag:first");
+	    if(!W.length){
+		return true
+	    }
+	    click_node(W,true);
+	    return false;
+	    break;
+	case 35://#
+	    S=end_tag_container.find(".post-tag:last");
+	    if(!S.length){return true}
+	    click_node(S);
+	    return false;
+	    break;
+	case 40://(
+	    d();
+	    $(".tag-suggestions > div:first").focus();
+	    return false;
+	    break;
+	case 9:d();//Tab
+	    break;
+	case 27:remove_suggest();//Escape
+	    break;
+	case 13://Carriage return
+	    if($(".tag-suggestions").length){return false}
+	    break
+	}
+	return true
+    }
+
+    var M;
+    var I;
+
+    function y(T){
+	var S=T.find("p.more-info");
+	if(typeof I==="undefined"){I=P-5-S.outerWidth()}
+	var e=T.find(".post-tag:first").outerWidth()+T.find(".item-multiplier").outerWidth();
+	if(e>I){S.find("a").text("info")}
+    }
+
+    function s(T,S){
+	$(".tag-suggestions").remove();
+	J=false;
+	var U=T.length;
+	if(U===0){return}
+	var W=$("<div class='tag-suggestions' />").css({position:"absolute",left:t.position().left,top:t.position().top+tag_eidtor_ih+1,width:w-10}).insertAfter(t);
+	for(var V=0;V<T.length;V++){
+	    var e=k(T[V],S).appendTo(W).attr("tabindex",table_index||0);
+	    y(e);
+	    if(V%3===0){e.css("clear","both")}
+	}
+	W.delegate("div","keydown",m);
+	W.delegate("div","click",function(X){if(!$(X.target).is("a")){h($(this))}});
+	W.delegate("div","focus",function(){if(L&&U===1){h($(this))}else{J=true}});
+	W.delegate("div","blur",function(){J=false})
+    }
+
+    function a(){
+	var e=sanitizeAndSplitTags(input_box.val())[0];
+	if(M===e){return}
+	M=e;
+	if(!(e&&e.length)){
+	    remove_suggest();
+	    return
+	}
+	p(e,function(S){if(e!==M||!g){return}s(S,e)})
+    }
+
+    function k(Z,e){
+	var S=$("<div />").css("width",P).data("tag-name",Z.SynonymOf||Z.Name);
+	if(e){
+	    e=e.replace(/-/g,"").replace(/(.)(?=.)/g,"$1-*").replace(/\+/g,"\\+").replace(/\./g,"\\.")
+	}
+	var Y=createtag(Z.Name,true);
+	var U=Y.html();
+	if(e){
+	    U=U.replace(new RegExp("("+e+")"),"<span class='match'>$1</span>")
+	}
+	S.append(Y.html(U));
+	if(Z.Count){
+	    S.append($("<span class='item-multiplier' />").html("&times;&nbsp;"+Z.Count))
+	}
+	var T="";
+	if(Z.Excerpt){
+	    T=Z.Excerpt
+	}
+	if(T.length){S.append($("<p />").text(T))}
+	if(Z.Synonyms&&Z.Synonyms.length){
+	    var V=$("<p >also: </p>").appendTo(S);
+	    var X=Z.Synonyms.split(/\|/);
+	    for(var W=0;W<X.length;W++){
+		T=X[W];
+		if(e){
+		    T=T.replace(new RegExp("("+e+")"),"<span class='match'>$1</span>")
+		}
+		if(W>0){
+		    T=", "+T
+		}
+		V.append("<span>"+T+"</span>")
+	    }
+	}
+	S.append("<p class='more-info'><a href='/tags/"+encodeURIComponent(Z.SynonymOf||Z.Name)+"/info' target='_blank'>learn more</a></p>");
+	return S
+    }
+
+    var search_tag_cache={};
+
+    var search_tag_action=StackPointer.helpers.DelayedReaction(
+	function(e,S){
+	    StackPointer.helpers.addSpinner(tag_editor,{position:"absolute",right:10,top:tag_eidtor_ih/2-2});
+	    $.get("/filter/tags",{table_index:e,newstyle:true},"json").done(function(T){search_tag_cache["t_"+e]=T;StackPointer.helpers.removeSpinner();S(T) })
+	},
+	400,
+	{sliding:true}
+    );
+
+    function p(e,S){
+	return
+	//TODO i return here , and not to show more tag infomation
+	if(search_tag_cache["t_"+e]){
+	    S(search_tag_cache["t_"+e])
+	}else{
+	    search_tag_action.trigger(e,S)
+	}
+    }
+
+    function h(e){
+	input_box.val(e.data("tag-name"));
+	E();
+	click_node("");
+	flash_tags()
+    }
+
+    function remove_suggest(){
+	$(".tag-suggestions").remove();
+	J=false;
+	search_tag_action.cancel()
+    }
+
+    function m(e){
+	var S;
+	switch(e.which){
+	case 39:case 40:
+	    $(this).next("div").focus();
+	    return false;
+	    break;
+	case 37:
+	    $(this).prev("div").focus();
+	    return false;
+	    break;
+	case 38:
+	    S=$(this).prev("div");
+	    if(S.length){S.focus()}
+	    else{input_box.focus()}
+	    return false;
+	    break;
+	case 27:
+	    remove_suggest();
+	    input_box.focus();
+	    return false;
+	    break;
+	case 13:
+	case 32:
+	    h($(this));
+	    return false;
+	    break
+	}
+    }
+
+    flash_tags(true);
+
+    //StackPointer.helpers.genericBindOverlayEvents(tag_editor,input_box,B);
+    StackPointer.tagEditor.ready.resolve()
+};
+StackPointer.tagEditor.ready=$.Deferred();
+
+

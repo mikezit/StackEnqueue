@@ -1,0 +1,8 @@
+{% load i18n smart_if ui_registry %}
+
+<div id="user-menus-container" class="context-menu">
+<!--    <span id="user-menus" class="context-menu-trigger">{% trans "User tools" %} &#9660;</span>-->
+<!--    <ul id="user-menus-dropdown" class="context-menu-dropdown">-->
+{% loadregistry user_menu %}{% endloadregistry %}
+<!--    </ul>-->
+</div>

@@ -1,0 +1,158 @@
+<!DOCTYPE html >
+<!-- base_content.html -->
+{% load i18n extra_tags extra_filters markup ui_registry %}
+<html>
+    <head> 
+        <title>{% block fulltitle %}{% block title %}{% endblock %} - {{ settings.APP_SHORT_NAME }}{% endblock %}</title>
+	<meta property="wb:webmaster" content="dabeff4ee647e58c" />
+        <meta name="description" content="{% block metadescription %}{{ settings.APP_DESCRIPTION }}{% endblock %}" />
+        <meta name="keywords" content="{% block metakeywords %}{{ settings.APP_KEYWORDS }}{% endblock %}" />
+        {% block meta %}{% endblock %}
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        {% if settings.GOOGLE_SITEMAP_CODE %}
+        <meta name="google-site-verification" content="{{ settings.GOOGLE_SITEMAP_CODE }}" />
+        {% endif %}
+        <link rel="shortcut icon" href="{{ settings.APP_FAVICON }}" />
+        <link href="{% media  "/media/style/style.css" %}" rel="stylesheet" type="text/css" />
+        {% if settings.USE_CUSTOM_CSS|or_preview:request %}
+        <link href="{% url custom_css %}" rel="stylesheet" type="text/css" />
+        {% endif %}
+        {% block forestyle %}{% endblock %}
+        <script type="text/javascript" src="{% media  "/media/js/jquery.min.js" %}"></script>
+        <script type="text/javascript">
+        /* <![CDATA[ */
+            var i18nLang = '{{settings.LANGUAGE_CODE}}';
+            var scriptUrl = '{{settings.FORCE_SCRIPT_NAME}}/';
+            var osqaSkin = '{{settings.OSQA_SKIN}}';
+            var appUrl = '{{ settings.APP_URL }}';
+
+            var messages = {
+                username: '{{ user.username }}',
+                confirm: "{% trans "Are you sure?" %}",
+                yes: "{% trans "Yes" %}",
+                no: "{% trans "No" %}",
+                message: "{% trans "Message:" %}",
+                cancel: "{% trans "Cancel" %}",
+                close: "{% trans "Close" %}",
+                ok: "{% trans "Ok" %}",
+                matching_tags_url: "{% url matching_tags %}",
+                word: "{% trans "word" %}",
+                words: "{% trans "words" %}",
+                character: "{% trans "character" %}",
+                characters: "{% trans "characters" %}"
+            }
+        /* ]]> */
+        </script>
+        <script type="text/javascript" src="{% media  "/media/js/enqueue.js" %}"></script>
+        {% if user_messages %}
+        <style type="text/css">
+            body { margin-top:2.4em; }
+        </style>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                var element = $('#validate_email_alert');
+                element.click(function(){notify.close(true);})
+                notify.show();
+            });
+        </script>
+        {% endif %}
+        <script type="text/javascript">
+           $(document).ready(function() {
+	      StackPointer.init();
+	    });
+	</script>
+        {% if settings.USE_CUSTOM_HEAD|or_preview:request %}
+            {{ settings.CUSTOM_HEAD|or_preview:request|safe }}
+        {% endif %}
+        {% block forejs %}{% endblock %}
+        <link rel="search" type="application/opensearchdescription+xml" href="{% url opensearch %}" title="{{ settings.APP_SHORT_NAME }} Search" />
+        {% loadregistry head_content %}{% endloadregistry %}
+    </head>
+    <body>
+        <div class="notify" style="display:none">
+            {% autoescape off %}
+                {% if user_messages %}
+                    {% for message in user_messages %}
+                          <p class="darkred">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endautoescape %}
+            <a id="close-notify" onclick="notify.close(true)">&#215;</a>
+        </div>
+        {% if settings.USE_CUSTOM_HEADER|or_preview:request %}
+            <div id="custom_header">
+                {{ settings.CUSTOM_HEADER|or_preview:request|static_content:settings.CUSTOM_HEADER_RENDER_MODE }}
+            </div>
+        {% endif %}
+        {% include "header.html" %}
+        {% block page_center %}
+        <div id="wrapper">
+            <div id="room">
+                <div id="CAFull">
+                    {% block content%}
+                    {% endblock%}
+                </div>
+                <div id="tail" style="clear:both;">
+                    {% block tail %}
+                    {% endblock %}
+                </div>
+            </div>
+            <div class="spacer3"></div>
+        </div>
+        {% endblock %}
+        {% if settings.USE_CUSTOM_FOOTER|or_preview:request %}
+            {% ifequal settings.CUSTOM_FOOTER_MODE|or_preview:request "above" %}
+                <div id="custom_footer">
+                    {{ settings.CUSTOM_FOOTER|or_preview:request|static_content:settings.CUSTOM_FOOTER_RENDER_MODE }}
+                </div>
+            {% endifequal %}
+            <div id="ground">
+                {% ifequal settings.CUSTOM_FOOTER_MODE|or_preview:request "replace" %}
+                    {{ settings.CUSTOM_FOOTER|or_preview:request|static_content:settings.CUSTOM_FOOTER_RENDER_MODE }}
+                {% else %}
+                    {% include "footer.html" %}
+                {% endifequal %}
+            </div>
+            {% ifequal settings.CUSTOM_FOOTER_MODE|or_preview:request "below" %}
+                <div id="custom_footer">
+                    {{ settings.CUSTOM_FOOTER|or_preview:request|static_content:settings.CUSTOM_FOOTER_RENDER_MODE }}
+                </div>
+            {% endifequal %}
+        {% else %}
+		<div id="ground-block">
+            <div id="ground">
+                {% include "footer.html" %}
+            </div>
+		</div>
+        {% endif %}
+        {% block endjs %}
+        {% endblock %}
+        {% if settings.GOOGLE_ANALYTICS_KEY %}
+            <script type="text/javascript">
+//              var __onload = window.onload;
+//	      window.onload=function(){
+                var _gaq = _gaq || [];
+                _gaq.push(['_setAccount', '{{ settings.GOOGLE_ANALYTICS_KEY }}']);
+		_gaq.push(['_addOrganic', 'baidu', 'word']);
+		_gaq.push(['_addOrganic', 'soso', 'w']);
+		_gaq.push(['_addOrganic', '3721', 'name']);
+		_gaq.push(['_addOrganic', 'yodao', 'q']);
+		_gaq.push(['_addOrganic', 'vnet', 'kw']);
+		_gaq.push(['_addOrganic', 'sogou', 'query']);
+
+                _gaq.push(['_trackPageview']);
+		_gaq.push(['_trackPageLoadTime']);
+
+                (function() {
+		var ga = document.createElement('script');
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		ga.setAttribute('async', 'true');
+		document.documentElement.firstChild.appendChild(ga);
+                })();
+//                __onload();
+//	      }
+            </script>
+        {% endif %}
+    </body>
+</html>
+<!-- end template base_content.html -->

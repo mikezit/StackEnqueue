@@ -1,0 +1,29 @@
+{% extends "question_base.html" %}
+<!-- template logout.html -->
+{% load extra_tags %}
+{% load humanize %}
+{% load i18n %}
+{% block title %}{% spaceless %}{% trans "Logout" %}{% endspaceless %}{% endblock %}
+{% block forejs %}
+    <script type="text/javascript">
+    $().ready(function(){
+        $('#btLogout').bind('click', function(){ window.location.href='{% url user_signout %}?next={{ next }}'; });
+    });
+    </script>
+{% endblock %}
+{% block topcontent %}        
+<div class="subheader">
+    <h1>{% trans "Logout" %}</h1>
+</div>
+{% endblock %}
+{% block content %}
+<div class="logout" id="main-body" style="width:100%;margin-top:20px">
+  <p>你是社区的一名<span class="revision-comment"><b sytle="font-weight: bold;background:">注册</b></span>用户</p>
+  <p>当前你使用下面的认证信息登录：</p>
+  <h3>邮箱</h3>
+  <p class="description-text">{{mail}}</p>
+  <p>你可以使用<a class="description-text">google,yahoo,openid</a>的认证方式登录,点击确认退出将会清除在当前浏览器上的所有认证信息,并使你登出当前服务</p>
+  <input id="btLogout" type="button" class="submit" value="{% trans "Logout now" %}">
+</div>
+{% endblock %}
+<!-- end logout.html -->

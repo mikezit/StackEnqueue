@@ -1,0 +1,10 @@
+{% load i18n %}
+{% load user_tags %}
+{% load markup %}
+
+<div class="boxD">
+  <h2>{% trans "new things" %}</h2>
+  {% for activity in recent_activity %}
+  <p> {% activity_desc activity "sdaf" %} <p>
+  {% endfor %}
+</div>

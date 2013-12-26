@@ -1,0 +1,46 @@
+{% extends "base_content.html" %}
+<!-- user.html -->
+{% load extra_tags %}
+{% load extra_filters %}
+{% load humanize %}
+{% load smart_if %}
+{% block forejs %}
+    <script type="text/javascript" src='{% media "/media/js/jquery-1.5.min.js"%}'></script>
+    <script type="text/javascript" src='{% media "/media/js/jquery.Jcrop.js"%}'></script>        
+    <link rel="stylesheet" href='{% media "/media/style/jquery.Jcrop.css" %}' type="text/css" />
+{% endblock%}
+
+{% block title %}头像设置{% endblock %}
+
+{% block content %}
+  <div class="subheader" >
+    <h1> {{user.decorated_name}} > 更改您的头像</h1>
+  </div>
+
+  <table style="margin-top:30px">
+    <tbody>
+        <tr>    
+            <td>
+	      <img width="{{ original.image_width }}" height="{{ original.image_height }}" src="{{ original.get_image_url }}" id="cropbox" alt="" />
+	    </td>
+	    <td>
+	      <div style="margin-left:30px">
+		<div style="border:1px solid #ccc;width: 100px; height: 100px; overflow: hidden;">
+		  <img src="{{ original.get_image_url }}" id="preview" alt="" />
+		</div>
+		<p>预览</p>
+	      </div>
+	    </td>
+        </tr>
+    </tbody>
+
+    </table>
+    <div>
+        <form method="post" id="crop-form" action="{{ original.get_absolute_url }}">
+        <!--<form method="post" id="crop-form" action="/{% url crop_gravatar user.id original.id %}">-->
+          <div style="display:none"> {{ form.as_p }} </div>
+          <p><input type="submit" value="保存" /></p>
+        </form>
+    </div>
+    <script type="text/javascript" src='{%media "/media/js/cropper.js"%}'>&nbsp;</script>
+{% endblock %}

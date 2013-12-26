@@ -1,0 +1,12 @@
+{% load i18n %}
+{% blocktrans %}Would you like to copy the permanent link to your clipboard?{% endblocktrans %}
+<!--<label for="permanent_link_url">{% trans "Permanent link" %}:</label>-->
+<input id="permanent_link_url" name="permanent_link_url" type="text" value="{{ url }}"/>
+{% spaceless %}
+{% endspaceless %}
+<script type="text/javascript">
+$(document).ready(function() {
+    // We highlight the content of the text field on click event
+    $('#permanent_link_url').select();
+})
+</script>

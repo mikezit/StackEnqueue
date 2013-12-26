@@ -1,0 +1,24 @@
+{% extends "user.html" %}
+
+{% load extra_tags %}
+{% load user_tags %}
+{% block usercontent %}
+<div class="subheader" >
+{% include "users/tabsb.html" %}
+</div>
+<div style="margin-top:10px;font-size:13px;">
+  <table class="history-table">
+    <tbody>
+      {% for act in activities %}
+      {% user_activity_item act request.user %} 
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script type="text/javascript">
+  $(function () {
+  StackPointer.user.expandPostBody('.history-table td.async-load', '<td/><td/>'); 
+  });            
+</script>
+{% endblock %}
+

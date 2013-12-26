@@ -1,0 +1,246 @@
+{% extends "question_base.html" %}
+{% load extra_tags %}
+{% load humanize %}
+{% load i18n %}
+
+{% block fulltitle %}{% spaceless %}{% trans "Markdown Help" %}{% endspaceless %}{% endblock %}
+
+{% block forejs %}
+    <link rel="stylesheet" type="text/css" media="all" href="{% media  "/media/style/markdown_help.css" %}" />
+{% endblock %}
+{% block topcontent %}
+<div class="subheader">
+  <h2>Markdown 语法</h2>
+</div>
+{% endblock %}
+{% block content %}
+    <div id="main-wrapper">
+
+        <div id="code" class="section" style="padding-top:15px">
+            <h2 class="section-title">代码和预格式文本</h2>	  
+            <div class="section-description">
+	      缩进4个空白字符来显示代码
+	    </div>
+            <table class="section-example"><tr>
+                <td>
+		  <code>
+		  <span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>printf("hello world!");  /*  print hello <br/> 
+		  <span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                       world test*/
+		  </code>
+		</td>
+		<td>
+		</td>
+	    </table>
+	</div>
+
+        <div id="linebreak" class="section">
+            <h2 class="section-title">换行</h2>	  
+            <div class="section-description">
+	      在一行的末尾加入两个空白字符来表示换行
+	    </div>
+            <table class="section-example"><tr>
+                <td>
+		  <code>下面应该换行了</code><code><span class="spaces">&nbsp;&nbsp;</span><br/></code>
+		  新的一行开始了
+		</td>
+		<td>
+		</td>
+	    </table>
+	</div>
+
+        <div id="headers" class="section">
+            <h2 class="section-title">标题</h2>
+            <div class="section-description">
+                在文字的下面加上下划线可以显示出标题，下划线=或则-的个数多少没有关系
+            </div>
+            <table class="section-example"><tr>
+                <td>
+                    <code>{% trans "This is an H1" %}</code><br/>
+                    <code><span class="hi">=============</span> </code><br/>
+                    <code>{% trans "This is an H2" %}</code><br/>
+                    <code><span class="hi">-------------</span></code>
+
+                </td>
+                <td>
+                    <h1>{% trans "This is an H1" %}</h1>
+                    <h2>{% trans "This is an H2" %}</h2>
+                </td>
+            </tr>
+	    </table>
+            
+            <div class="section-description">
+	      使用#字符也可以显示出不同的标题来
+            </div>
+            <table class="section-example"><tr>
+                <td>
+                    <code><span class="hi">#</span> {% trans "This is an H1" %}</code><br/>
+                    <code><span class="hi">##</span>  {% trans "This is an H2" %}</code><br/>
+                    <code><span class="hi">###</span>  {% trans "This is an H3" %}</code><br/>
+                </td>
+                <td>
+                    <h1>{% trans "This is an H1" %}</h1>
+                    <h2>{% trans "This is an H2" %}</h2>
+                    <h3>{% trans "This is an H3" %}</h3>
+                </td>
+            </tr></table>
+        </div>
+
+        <div id="paragraphs" class="section">
+            <h2 class="section-title">段落</h2>
+            <div class="section-description">
+	      每个段落由空行分开
+            </div>
+            <div class="section-example">
+                <code>我是第一个段落</code><br/>
+	    <span class="hi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br /></span>
+                <code>我是第二个段落</code>
+            </div>
+        </div>
+
+        <div id="links" class="section">
+            <h2 class="section-title">URL链接</h2>
+            <div class="section-description">
+	      有三种方法来表示一个url链接
+            </div>
+            <table class="section-example"><tr>
+                <td>
+                    <code>这是一个到<span class="hi">[维基百科](http://zh.wikipedia.org)</span>的链接</code><br/>
+                    <code>这是一个到<span class="hi">[维基百科][1]</span>的链接 </code><br/>
+                    <code>这是一个到<span class="hi">[维基百科][wiki]</span>的链接</code>
+		    <br/>
+		    <br/>
+		    <span class="hi">[1]:</span>http://zh.wikipedia.org
+		    <br/>
+		    <span class="hi">[wiki]:</span>http://zh.wikipedia.org
+                </td>
+            </tr></table>
+	    <div class="section-description">
+	      链接可以在文本的任何位置使用，<span class="hi">[1]</span> 和 <span class="hi">[wiki]</span>可以是任何唯一的字符串，它们的大小写是不区分的,使用[WIKI]和[wiki]会得到相同的结果。
+	    </div>
+        </div>
+
+        <div id="formatting" class="section">
+            <h2 class="section-title">字体样式</h2>
+            <div class="section-description">
+	      在文字两边加上两个星号*或则两个下划线_来显示粗体字
+            </div>
+            <table class="section-example"><tr>
+                <td>
+                    <code><span class="hi">**</span>{% trans "This is bold" %}<span class="hi">**</span></code><br/>
+                    <code><span class="hi">__</span>{% trans "This is also bold" %}<span class="hi">__</span></code>                </td>
+                <td>
+                    <strong>{% trans "This is bold" %}</strong><br/>
+                    <strong>{% trans "This is also bold" %}</strong>
+                </td>
+            </tr></table>
+
+            <div class="section-description">
+	      在文字两边加上星号*或则下划线_来显示斜体字
+            </div>
+            <table class="section-example"><tr>
+                <td>
+                    <code><span class="hi">*</span>{% trans "This is italics" %}<span class="hi">*</span></code><br/>
+                    <code><span class="hi">_</span>{% trans "This is also italics" %}<span class="hi">_</span></code>
+                </td>
+                <td>
+                    <i>{% trans "This is italics" %}</i><br/>
+                    <i>{% trans "This is also italics" %}</i>
+                </td>
+            </tr></table>
+            <div class="section-description">
+	      在文字两边加上三个星号*或则三个下划线_来显示粗斜体字
+            </div>
+            <table class="section-example"><tr>
+                <td>
+                    <code><span class="hi">***</span>{% trans "This is bold and italics" %}<span class="hi">***</span></code><br/>
+                    <code><span class="hi">___</span>{% trans "This is also bold and italics" %}<span class="hi">___</span></code>
+                </td>
+                <td>
+                    <strong><i>{% trans "This is bold and italics" %}</i></strong><br/>
+                    <strong><i>{% trans "This is also bold and italics" %}</i></strong>
+                </td>
+            </tr></table>
+        </div>
+
+
+        <div id="blockquotes" class="section">
+            <h2 class="section-title">文本缩进</h2>
+            <div class="section-description">
+	      在文本的第一个字符前加上 &gt; 创建一个文本缩进
+            </div>
+            <table class="section-example"><tr>
+                <td>
+                    <code><span class="hi">&gt; </span>{% trans "This is part of a blockquote." %}</code><br />
+                    <code><span class="hi">&gt; </span>{% trans "This is part of the same blockquote." %}</code>
+                </td>
+                <td>
+                    <p style="padding-left:15px;">{% trans "This is part of a blockquote." %}<br />{% trans "This is part of the same blockquote." %}</p>
+                </td>
+            </tr></table>
+
+            <div class="section-description">
+	      你可以在一个段落的开始加上缩进符，然后用一个空行来结束缩进
+            </div>
+            <table class="section-example"><tr>
+                <td>
+                    <code><span class="hi">&gt; </span>{% trans "This is part of a blockquote." %}</code><br />
+                    <code>{% trans "This continues the blockquote even though there's no bracket." %}</code><br /><br />
+                    <code>{% trans "The blank line ends the blockquote." %}</code>
+                </td>
+                <td>
+                    <p style="padding-left:15px;">{% trans "This is part of a blockquote." %} <br /> {% trans "This continues the blockquote even though there's no bracket." %}</p>
+                    <p>{% trans "The blank line ends the blockquote." %}</p>
+                </td>
+            </tr></table>
+        </div>
+
+        <div id="lists" class="section">
+             <h2 class="section-title">列表</h2>
+             <div class="section-description">
+	       带数字标识的列表
+             </div>
+             <table class="section-example"><tr>
+                 <td>
+                   <code><span class="hi">1.</span><span class="spaces">&nbsp;</span>{% trans "Item" %} 1</code><br />
+                    <code><span class="hi">2.</span><span class="spaces">&nbsp;</span>{% trans "Item" %} 2</code><br />
+                    <code><span class="hi">3.</span><span class="spaces">&nbsp;</span>{% trans "Item" %} 3</code>
+                 </td>
+                 <td>
+                    <ol>
+                        <li>{% trans "Item" %} 1</li>
+                        <li>{% trans "Item" %} 2</li>
+                        <li>{% trans "Item" %} 3</li>
+                    </ol>
+                 </td>
+             </tr></table>
+
+             <div class="section-description">
+	       带星号标识的列表，可以使用 + - * 来表示，它们三个都是一样的
+             </div>
+             <table class="section-example"><tr>
+                 <td>
+                    <code><span class="hi">*</span><span class="spaces">&nbsp;</span>{% trans "A list item" %}</code><br />
+                    <code><span class="hi">+</span><span class="spaces">&nbsp;</span>{% trans "Another list item" %}</code><br />
+                    <code><span class="hi">-</span><span class="spaces">&nbsp;</span>{% trans "A third list item" %}</code>
+                 </td>
+                 <td>
+                    <ul>
+                        <li>{% trans "A list item" %}</li>
+                        <li>{% trans "Another list item" %}</li>
+                        <li>{% trans "A third list item" %}</li>
+                    </ul>
+                 </td>
+             </tr></table>
+        </div>
+
+        <div id="more" class="section">
+            <h2 class="section-title">更多</h2>
+            <div class="section-description">
+	      在Markdown的<a href="http://daringfireball.net/projects/markdown/syntax" target="_blank" rel="nofollow">官方文档</a>中会有更多的介绍
+	    </div>
+        </div>
+    </div>
+{% endblock %}
+{% block sidebar %}
+    {% include "sidebar/markdown_index.html" %}
+{% endblock %}

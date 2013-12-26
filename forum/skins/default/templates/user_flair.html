@@ -1,0 +1,32 @@
+{% load question_list_tags %}
+{% load i18n %}
+{% load extra_tags %}
+{% load general_sidebar_tags %}
+{% load ui_registry  extra_filters markup %}
+<html>
+<head>
+  <link href="{% media  "/media/style/style.css" %}" rel="stylesheet" type="text/css" />
+</head>
+<body style="width:208px;height:58px;">
+  <div class="flair-container">
+    <div class="flair-gravatar">
+      <a href="{{ user.get_profile_url }}">
+	<div class="">
+	  {% gravatar user 48 %}
+	</div>
+      </a>
+    </div>
+    <div class="flair-site-info">
+    </div>
+    <div class="flair-header-info">
+      <a class="asiteFavicon"><img src="{{settings.APP_URL}}/m/default/media/images/favicon.ico"/></a>
+      <a href="{{ user.get_profile_url }}" class="flair-user-link">{{ user.decorated_name }}</a><br />
+      <div class="um-flair">
+	{% get_location user %}<br>
+	{% get_reputation user %}<br>
+	{% get_score_badge user %}<br>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

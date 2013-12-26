@@ -1,0 +1,28 @@
+{% load question_list_tags %}
+{% load i18n %}
+{% load extra_tags %}
+{% load general_sidebar_tags %}
+{% load ui_registry  extra_filters markup %}
+
+<div> <div class="tm-heading"><span class="tm-sub-info">
+      <a title="toggle this tag between favorite, ignored, and normal" class="tm-favorite-clear">&#9733;</a>
+      <span class="tm-count" title="{{ subscribed_count }}">{{ subscribed_count }} </span> 人关注 <span class="tm-sub-links" style="float:right;">
+	{% if request.user.is_authenticated %}
+	<a class="ajax-command tm-sub-links  subscription_switch" href="/subscribe_tag/{{ tag.name }}" title="接受此标签的问题的通知">	{% if tag.name in subscribed_tags %}取消关注{% else %}关注{% endif %}</a>
+	{% endif %}
+<!--<span style="color:#727272;">|</span> <a href="/feeds/tag/python" title="add this tag to your rss reader">rss</a>-->
+      </span>
+  </span></div>
+
+<div class="tm-description">
+{% if tag.about %}
+  {{tag.about}}
+{% else%}
+  {% if request.user.is_authenticated and not tag.suggested %}
+    <a style="color:#fff;" href="/tag/{{tag.id}}/edit">维基里还没有对"{{tag.name}}"标签的介绍，你能帮助我们编辑此条目吗？</a>
+  {% endif %}
+{% endif %}
+</div>
+
+</div>
+<span class="tm-links"><a href="/tags/{{tag.name}}/?sort={% trans "hottest" %}">相关问题</a> <a href="/tag/{{tag.id}}/info">详细介绍</a> <!--<a href="/tags/python/topusers">top users</a>--></span>

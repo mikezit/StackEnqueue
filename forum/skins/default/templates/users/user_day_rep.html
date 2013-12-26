@@ -1,0 +1,15 @@
+{% load i18n %}
+{% load extra_tags %}
+{% load extra_filters %}
+{% load humanize %}
+{% load user_tags %}
+
+<div class="rep-breakdown">
+  <table class="tbl-reputation">
+    <tbody>
+      {% for rep in reps%}
+      {% user_reputation_item rep rep.action request.user %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

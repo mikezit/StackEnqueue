@@ -1,0 +1,51 @@
+{% load i18n extra_tags email_tags %}
+
+{% declare %}
+    prefix = html.mark_safe(smart_str(settings.EMAIL_SUBJECT_PREFIX))
+    post = comment.parent
+    question = post.question and post.question or post
+    post_author = smart_str(post.author.username)
+post_author_link = html.objlink(post.author, style=settings.EMAIL_ANCHOR_STYLE) 
+    safe_post_author = html.mark_safe(smart_str(post.author.username))
+    comment_author = html.mark_safe(smart_str(comment.author))
+    question_title = html.mark_safe(smart_str(question.title))
+    safe_body = html.html2text(smart_str(comment.comment))
+    author_link = html.objlink(comment.author, style=settings.EMAIL_ANCHOR_STYLE)
+    question_link = html.objlink(question, style=settings.EMAIL_ANCHOR_STYLE)
+    exclude_greeting = True
+{% enddeclare %}
+
+{% email %}
+    {% subject %}{% blocktrans %}{{ prefix }} New comment on: {{ question_title }}{% endblocktrans %}{% endsubject %}
+
+    {% htmlcontent notifications/base.html %}
+        <p style="{{ p_style }}">
+            {{ author_link }} 
+	    评论了{% ifnotequal post question %}
+	    {{ post_author_link }}对
+	    {{ question_link }}
+	    的回答
+	    {% else %}
+            {% blocktrans %}the question {{ question_link }}{% endblocktrans %}
+            {% endifnotequal %}
+        </p>
+
+        <blockquote>
+        {{ comment.comment }}
+        </blockquote>
+
+    {% endhtmlcontent %}
+
+{% textcontent notifications/base_text.html %}
+{{ comment_author }}刚刚对
+{% ifnotequal post question %}
+{% blocktrans %}the answer posted by {{ safe_post_author }} to {% endblocktrans %}
+{% endifnotequal %}
+{% blocktrans %}the question "{{ question_title }}"{% endblocktrans %}
+发表了一个评论
+{{ safe_body }}
+
+{% trans "Don't forget to come over and cast your vote." %}
+{% endtextcontent %}
+
+{% endemail %}

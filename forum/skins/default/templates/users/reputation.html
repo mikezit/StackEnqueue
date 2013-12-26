@@ -1,0 +1,75 @@
+{% extends "user.html" %}
+<!-- user_reputation.html -->
+{% load i18n %}
+{% load extra_tags %}
+{% load extra_filters %}
+{% load humanize %}
+{% load user_tags %}
+{% block userjs %}
+       <script type='text/javascript' src='{% media  "/media/js/excanvas.min.js" %}'></script>
+       <script type='text/javascript' src='{% media  "/media/js/jquery.flot.min.js" %}'></script>
+       
+       <script type="text/javascript">
+        $().ready(function(){
+            //var d = {{ graph_data }};
+            //var placeholder = $("#diagram");
+            //var plot = $.plot(placeholder, [d], {
+            //    xaxis: { mode: "time" },
+            //    points: { show: true },
+            //    lines: { show: true }
+            //});
+        });
+
+        </script>
+{% endblock %}
+{% block usercontent %}
+<div class="subheader" >
+{% include "users/tabsb.html" %}
+</div>
+<!--<div id="diagram" style="width:550px;height:250px;"> </div>-->
+<div class="user-rep-full">
+<table class="rep-table">
+    <tbody>
+      {% for date,score,reps in reputation %}
+      <tr class="rep-table-row">
+	<td class="rep-cell">
+	  <span class={% if score > 0 %}"rep-up" {% else %}"rep-down" {% endif %}>{{ score  }}</span>
+	</td>
+	<td class="rep-day {% if not reps %}async-load{% endif %}" data-load-url="/rep/day/{{view_user.id}}/{{date.year}}/{{date.month}}/{{date.day}}/">
+	  {% if reps %}
+	  <a class="load-body {% if reps %}expander-arrow-small-hide hide-body expander-arrow-small-show {% endif %}"></a>
+	  {% endif %}
+	  {{date|date:"n月j 'y"}}
+	</td>
+      </tr>
+      <tr class="loaded-body">
+	<td colspan="2" class="body-container body-loaded" style="height: 0px;"> 
+	  <div style="display: block;"> 
+	    {% if forloop.counter0 < 3 %}
+	    <div class="rep-breakdown">
+	      <table class="tbl-reputation">
+		<tbody>
+		  {% for rep in reps%}
+                    {% user_reputation_item rep rep.action request.user %}
+		  {% endfor %}
+		</tbody>
+	      </table>
+	    </div>
+	    {% endif %}
+	  </div>
+	</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script type="text/javascript">
+  $(function () {
+  StackPointer.user.expandPostBody('.rep-table td.async-load:not(.load-prepped)', '', 
+  function (cell) {
+  StackPointer.user.expandPostBody(cell.find('td.async-load:not(.load-prepped)'), '', null, 4);
+  }, 
+  4);
+  });            
+</script>
+{% endblock %}<!-- end user_reputation.html -->

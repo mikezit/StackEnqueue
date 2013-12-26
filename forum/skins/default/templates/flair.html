@@ -1,0 +1,30 @@
+{% extends "base_content.html" %}
+{% load extra_tags %}
+{% load user_tags %}
+{% load humanize %}
+{% load i18n %}
+{% block title %}{% spaceless %}{% trans "Flair" %}{% endspaceless %}{% endblock %}
+{% block content %}
+<div class="subheader">
+    <h1>{{user.username}} > {% trans "Flair" %}</h1>
+    <div class="sub-header-links fr">
+      {% if can_view_private %}
+      {% user_menu request.user view_user %}
+      {% endif %}
+    </div>
+</div>
+<div class="user-page-content">
+<h2>这是什么?</h2>
+<p>这是一个显示你才华的标识，可以用来显示你的资料,并可以将它放在任何网站上。</p>
+<img src="{{ settings.APP_URL }}/users/flair/{{user.id}}.png" width="208" height="58" alt="{{user.username}}在{{settings.APP_SHORT_NAME}}上的个人标识,{{ settings.APP_DESCRIPTION }} " title="{{user.username}}在{{settings.APP_SHORT_NAME}}上的个人资料,{{ settings.APP_DESCRIPTION }}">
+<p>(注意,个人标识会在每隔24-32小时左右更新一次，所以，你的显示可能有延迟。)</p>
+<h2>怎么使用?</h2>
+<p>只需复制下面的html代码到你想要的网站，就可以显示你在{{settings.APP_SHORT_NAME}}的个人标识了。</p>
+<textarea cols="80" rows="4" style="margin-left: 0px; margin-right: 0px; width: 960px; margin-top: 0px; margin-bottom: 0px; height: 90px; " class="flair-textbox">
+<a href="{{ settings.APP_URL }}/users/{{user.id}}/{{user.username}}">
+<img src="{{ settings.APP_URL }}/users/flair/{{user.id}}.png" width="208" height="58" alt="{{user.username}}在{{settings.APP_SHORT_NAME}}上的个人标识,{{ settings.APP_DESCRIPTION }} " title="{{user.username}}在{{settings.APP_SHORT_NAME}}上的个人标识,{{ settings.APP_DESCRIPTION }}">
+</a>
+</textarea>
+</div>
+{% endblock %}
+

@@ -1,0 +1,91 @@
+{% extends "base_content.html" %}
+<!-- user.html -->
+{% load extra_tags %}
+{% load extra_filters %}
+{% load humanize %}
+{% load smart_if %}
+{% block forejs %}
+<script type="text/javascript">
+  function all_checked(attr){
+     $("#local_gravatar").attr("checked", attr);
+     $("#weibo_gravatar").attr("checked", attr);
+     $("#email_gravatar").attr("checked", attr);
+  }
+  
+  $(function(){
+    $("#reupload").click(function(){
+       $("#upload-box").css("display","block");
+    })
+    $("#email_gravatar").click(function(){
+        all_checked(false);
+        $("#email_gravatar").attr("checked", true);
+     })
+    $("#local_gravatar").click(function(){
+        all_checked(false);
+        $("#local_gravatar").attr("checked", true);
+     })
+    $("#weibo_gravatar").click(function(){
+        all_checked(false);
+        $("#weibo_gravatar").attr("checked", true);
+     })
+  })
+</script>
+{% endblock%}
+
+{% block title %}头像设置{% endblock %}
+
+{% block content %}
+  <div class="subheader" >
+    <h1> {{user.decorated_name}} > 更改您的头像</h1>
+  </div>
+  
+  <form method="post" action="{% url edit_gravatar user.id%}" enctype="multipart/form-data">
+  <div class="gravatar-box">
+    <table>
+      <tbody>
+	<tr>
+	  <td class="gravatar-item">
+	    {% real_gravatar user 128 %}
+	    <p>使用Gravatar {{gravatar_form.gravatar}}</p>
+	    <p><a href="http://www.gravatar.com/" >更改Gravatar</a></p>
+	  </td>
+	  <td><div style="background-color:#fff;height:205px;width:100px;">&nbsp;</div> <td>
+	  <td class="gravatar-item">
+	    {%if user.local_gravatar %}
+	    {% local_gravatar user 128 %}
+	    <p>使用本地图片 {{gravatar_form.local_gravatar}}</p>
+	    <p><a id="reupload" href="#">重新上传</a></p>
+	    {%endif%}
+	  </td>
+	  <td><div style="background-color:#fff;height:205px;width:100px;">&nbsp;</div> <td>
+	  <td class="gravatar-item">
+	    {%if user.weibo_gravatar %}
+	    {% weibo_gravatar user 128 %}
+	    <p>使用微博图片 {{gravatar_form.weibo_gravatar}}</p>
+	    <p><a id="reupload" href="#">刷新</a></p>
+	    {%endif%}
+	  </td>
+	  <td>
+	    <div style="{%if not user.local_gravatar and not user.weibo_gravatar%}display:none;{%endif%}background-color:#fff;height:205px;width:100px;">
+	      <input style="float:right;margin-top:170px" type="submit" value="保存" />
+	    </div>
+	  </td>
+	</tr>
+      </tbody>
+    </table>
+  </div>
+  </form>
+
+  <div id="upload-box" style="{%if user.local_gravatar %}display:none{%endif%}">
+    <p style="color:#333;font-weight:bold">{%if not user.local_gravatar %}或则 {%else%}重新{%endif%}上传自己的头像</p>
+    <form method="post" action="{% url edit_gravatar user.id%}" enctype="multipart/form-data">
+      <div>
+	{{ form.image }}
+	{{ form.image.errors }}
+	<p>(注意，图片的大小限制在{{settings.GRAVATAR_MAX_WIDTH}}&#215;{{settings.GRAVATAR_MAX_HEIGHT}}以内)</p>
+	<p><input type="submit" value="上传" /></p>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

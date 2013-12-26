@@ -1,0 +1,11 @@
+../forum/skins/default/media/style/style.css
+../forum/skins/default/media/style/user.css
+../forum/skins/default/media/style/auth.css
+../forum/skins/default/media/style/admin.css
+../forum/skins/default/media/style/default.css
+../forum/skins/default/media/style/markdown_help.css
+../forum/skins/default/media/style/openid.css
+../forum/skins/default/media/style/syntax.css
+../forum/skins/default/media/style/prettify.css
+../forum/skins/default/media/style/jquery-ui.css
+../forum/skins/default/media/style/jquery.autocomplete.css

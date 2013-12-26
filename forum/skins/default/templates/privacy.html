@@ -1,0 +1,36 @@
+{% extends "base_content.html" %}
+<!-- privacy.html -->
+{% load extra_tags %}
+{% load i18n %}
+{% load humanize %}
+{% block title %}{% spaceless %}{% trans "Privacy policy" %}{% endspaceless %}{% endblock %}
+{% block forejs %}
+{% endblock %}
+{% block content %}
+{% declare %}
+    app_name = settings.APP_SHORT_NAME
+{% enddeclare %}
+<div class="subheader">
+  <h1>{% trans "Privacy policy" %}</h1>
+</div>
+<div id="main-body" style="width:100%;margin-top:20px">
+  <div class="content-page">
+    <p>
+      {{app_name}}承认用户的隐私的重要性:
+    </p>
+    
+    <p>尊重用户个人隐私是{{app_name}}的基本政策。</p>
+    <p>{{app_name}}一定不会公开、编辑或透露用户的注册资料，除非{{app_name}}认为透露这些信息在以下几种情况是必要的:</p>
+
+    <ur>
+      <li>遵守有关法律规定，包括在国家有关机关查询。</li>
+      <li>在紧急情况下维护用户个人和社会大众的隐私安全。</li>
+      <li>在您违反了{{app_name}}的服务条款或其它使用规定。</li>
+    </ur>
+    
+    <br/>
+    <p>随着{{app_name}}的服务范围和产品的不断改进,{{app_name}}有可能会更新我们的隐私策略。</p>
+  </div>
+</div>
+{% endblock %}
+<!-- end privacy.html -->

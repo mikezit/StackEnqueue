@@ -1,0 +1,18 @@
+{% load extra_tags %}
+{% load humanize %}
+{% load extra_tags %}
+{% load i18n %}
+
+<tr class="rep-breakdown-row">
+  <td class="rep-left">
+    <span class={% if rep.positive|add:rep.negative > 0 %}"rep-up" >+{% else %}"rep-down" >-{% endif %} {{ rep.positive|add:rep.negative  }}</span></td>
+  <td class="rep-time" title="{{rep.date}}">
+    {{rep.date|date:"H:i"}}
+  </td>
+  <td class="rep-desc">
+    {% trans rep.action.action_type %}
+  </td>
+  <td class="rep-link">
+    {{target}}
+  </td>
+</tr>

@@ -1,0 +1,127 @@
+<!-- user_info.html -->
+{% load extra_tags %}
+{% load extra_filters %}
+{% load humanize %}
+{% load smart_if %}
+{% load i18n %}
+{% load markup %}
+{% load user_tags %}
+
+<div class="subheader" >
+   <h1> {{view_user.decorated_name}}</h1>
+   <div class="sub-header-links fr">
+     {% if can_view_private %}
+     {% user_menu request.user view_user %}
+     {%endif%}
+   </div>
+</div>
+<div id="user-info-container">
+  <div class="user-header">
+    <div class="user-header-left">
+      <div class="gravatar">
+	<a href="{{ view_user.get_profile_url }}" >
+	  <div style="height:128px">{% gravatar view_user 128 %}
+	  </div>
+	</a>
+	{% if not view_user.is_suspended %}
+	<div class="user-reputation" id="user-reputation">
+	  <span>{{view_user.reputation|intcomma}}</span>
+	  {% trans "reputation" %}
+	</div>
+	<div class="user-badges">
+	  <a>{% get_score_badge view_user %}</a>
+	</div>
+	{% else %}
+	<div class="scoreNumber">{% trans "Suspended" %}</div>
+	<p>{{ view_user.suspension.extra.publicmsgsion.extra.publicmsg }}</p>
+	{% endif %}
+      </div>
+      <div class="data">
+            <table class="user-details">
+	      <!--
+              <tr>
+                <th colspan="2" align="left">
+		  <h3>{% trans "Registered user" %}</h3>
+		</th>
+              </tr>
+	      -->
+
+              {% if view_user.real_name %}
+              <tr>
+                <td>{% trans "real name" %}</td>
+                <td><span>{{view_user.real_name}}</span></td>
+              </tr>
+              {% endif %}
+
+              {% if view_user.location %}
+              <tr>
+                <td>{% trans "location" %}</td>
+                <td>{{view_user.location}}</td>
+              </tr>
+              {% endif %}
+
+              {% if view_user.date_of_birth%}
+              <tr>
+		<!--todo  - redo this with blocktrans -->
+                {% if view_user.date_of_birth.year != 1900%}
+                <td>{% trans "age" %}</td>
+                <td>{% get_age view_user.date_of_birth %} {% trans "age unit" %}</td>
+                {% endif %}
+              </tr>
+              {% endif %}
+
+              <tr>
+                  <td>{% trans "member for" %}</td>
+                  <td class="{{view_user.date_joined|time_color:"True" }}"><span>{% join_date view_user.date_joined %}</span></td>
+              </tr>
+
+              {% if view_user.last_seen %}
+              <tr>
+                <td>{% trans "last seen" %}</td>
+                <td class="{{view_user.last_activity|time_color}}"><span class="relativetime" title="{{ view_user.last_activity }}">{% join_date view_user.last_activity %}</span></td>
+              </tr>
+              {% endif %}
+
+              {% if can_view_private %}
+              <tr>
+                <td>{% trans "email" %}</td>
+                <td>
+                  <span href="mailto:{{ view_user.email }}">{{ view_user.email }}</span>
+                  {% if not view_user.email_isvalid %}
+                  ({% trans "not validated" %})
+                  {% ifequal request.user view_user %}
+              </td></tr><tr><td></td><td><a href="{% url send_validation_email %}">{% trans "Send me a validation link." %}</a>
+                  {% endifequal %}
+                  {% endif %}
+                    </td>
+              </tr>
+              {% endif %}
+
+              {% if view_user.website %}
+              <tr>
+                <td>{% trans "user's website" %}</td>
+                <td><a rel="nofollow" target="_blank" href="{{view_user.website}}">{{view_user.website}}</a></td>
+              </tr>
+              {% endif  %}
+
+	      <tr>
+                <td>{% trans "profile views" %}</td>
+		<td>{{view_user.profile_views}}</td>
+	      </tr>
+            </table>
+      </div>
+    </div>
+    <div class="user-about">
+      {% if view_user.about %}
+      {{view_user.about|markdown}}
+      {% else %}
+      {% if request.user == view_user %}
+      <p>(你的自我介绍还没填写)</p>
+      <a href="/users/{{view_user.id}}/edit/">点此来完成资料填写</a>
+      {% endif %}
+      {% endif %}
+      
+    </div>
+  </div>
+</div>
+<!-- end user_info.html -->

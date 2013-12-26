@@ -1,0 +1,41 @@
+{% extends "questions.html" %}
+<!-- index.html -->
+{% load general_sidebar_tags %}
+{% load question_list_tags %}
+{% load extra_tags %}
+{% load i18n %}
+{% block fulltitle %}{{ settings.APP_TITLE }}{% endblock %}
+{% block sidebar %}
+    {% if not request.user.is_authenticated %}
+<!--        {% if settings.SHOW_WELCOME_BOX %} -->
+    {% include "sidebar/welcome_box.html" %}
+<!--        {% endif %}-->
+   {% endif %}
+
+<!--    { sidebar_upper } -->
+    {% if request.user.is_authenticated %}
+        {% tag_selector %}
+        <p class="ar" style="margin-top:10px">
+	  <a href="/users/{{request.user.id}}/{{request.user}}/tags/">关注的标签»</a>
+	</p>
+    {% endif %}
+
+{% if known_tip %}
+{% if not request.user.is_authenticated or request.user.reputation < 500 %}
+  {% include "sidebar/known_tips.html" %}
+{% endif %}
+{% endif %}
+	    <!--adds-->
+	    <!-- <div class="box_ads"> -->
+	    <!--   <a><img height="250" width="220" border="0" src="{% media "/media/images/world.png" %}"> -->
+	    <!--   </a> -->
+	    <!-- </div> -->
+	    <!--adds ends-->
+
+    {% recent_tags %}
+    {% recent_awards %}
+<!--    {sidebar_lower} -->
+{% endblock %}
+<!-- index.html -->
+<!--    { include "question_list/count.html" } -->
+

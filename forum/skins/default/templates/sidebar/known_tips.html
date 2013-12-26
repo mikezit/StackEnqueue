@@ -1,0 +1,21 @@
+{% load i18n general_sidebar_tags %}
+{% load extra_tags %}
+{% load markup %}
+
+{% ifequal known_tip "flair" %}
+{% if request.user.is_authenticated%}
+<div class="box_tips">
+   <h3>你知道么？</h3>
+   <p>你可以把你在StackEnqueue上的<a href="{{APP_URL}}/users/{{request.user}}/{{request.user.id}}/flair/" >个人标识</a>放在任何网站上。</p>
+</div>
+{%endif%}
+{% else %}
+<div class="box_tips">
+  <h3>你知道么？</h3>
+  <div>
+    {{known_tip|markdown:"settingsparser"}}
+  </div>
+</div>
+{% endifequal %}
+
+

@@ -1,0 +1,173 @@
+{% extends "user.html" %}
+<!-- user_stats.html -->
+{% load i18n %}
+{% load extra_tags %}
+{% load extra_filters %}
+{% load humanize %}
+{% load question_list_tags %}
+{% block usercontent %}
+
+<div class="subheader" >
+{% include "users/tabsb.html" %}
+</div>
+
+{% if questions.paginator.count > 0 %}
+<p name="questions"></p>
+<div class="smallheader"  style="border:0px">
+{% spaceless %}
+<h2 style="float:left">
+  {% blocktrans count questions.paginator.count as counter %}
+  <span class="count">{{counter}}</span> 个问题
+  {% plural %}
+  <span class="count">{{counter}}</span> 个问题
+  {% endblocktrans %}
+  <a class="feed-icon" style="background-image:url('{% media "media/images/feed-icon-small.png" %}');"
+     href="{{ view_user.get_asked_url }}?type=rss" title="{% trans "subscribe to question RSS feed" %}"></a>
+</h2>
+{% endspaceless %}
+</div>
+{% endif %}
+{% if questions.paginator.count > 5 %}
+<div id="userpage" style="margin-right:5px">
+  {{ questions.paginator.sort_tabs }}
+</div>
+{% endif %}
+{% if questions.paginator.count > 0 %}
+<div id="listA" class="user-stats-table">
+  {% for question in questions.paginator.page %}
+  {% user_question_list_item question favorite_count=yes signature_type=badges %}
+  {% endfor %}
+</div>
+{% endif %}
+{% if answers.paginator.count > 5 %}
+<br clear="all"/>
+<div class="pager">{{ questions.paginator.page_numbers }}</div>
+{% endif %}
+<br clear="all"/>
+
+{% if answers.paginator.count > 0 %}
+<a name="answers"></a>
+<div class="smallheader" style="border:0px">
+{% spaceless %}
+<h2 style="float:left">
+  {% blocktrans count answers.paginator.count as counter %}
+  <span class="count">{{counter}}</span> 个回答
+  {% plural %}
+  <span class="count">{{counter}}</span> 个回答
+  {% endblocktrans %}
+</h2>
+{% endspaceless %}
+</div>
+{% endif %}
+
+{% if answers.paginator.count > 5 %}
+<div id="userpage" style="margin-right:5px">{{ answers.paginator.sort_tabs }}</div>
+{% endif %}
+
+{% if answers.paginator.count > 0 %}
+<div class="user-stats-table">
+  {% for answer in answers.paginator.page %}
+  <div class="answer-summary">
+    <a title="{{answer.question.title}}"
+       href="{{ answer.get_absolute_url }}">
+      <span class="{% if answer.nis.accepted %}answered-accepted {% endif %} answer-votes" 
+	    title="{% blocktrans with answer.score as vote_count %}the answer has been voted for {{ vote_count }} times{% endblocktrans %} {% if answer.nis.accepted %}{% trans "this answer has been selected as correct" %}{%endif%}">
+        {{ answer.score }}
+      </span>
+    </a>
+    <div class="answer-link">
+      {% spaceless %}
+      <a href="{{ answer.get_absolute_url }}">{{answer.headline}}</a>
+      {% endspaceless %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{%endif%}
+
+{% if answers.paginator.count > 0 %}
+<br clear="all"/>
+<div class="pager">{{ answers.paginator.page_numbers }}</div>
+{%endif%}
+<br clear="all"/>
+
+{% if total_votes %}
+<a name="votes"></a>
+{% spaceless %}
+<h2>
+  {% blocktrans count total_votes as cnt %}
+  <span class="count">{{cnt}}</span> 个投票
+  {% plural %}
+  <span class="count">{{cnt}}</span> 个投票
+  {% endblocktrans %}
+</h2>
+{% endspaceless %}
+<div class="user-stats-table">
+  <table>
+    <tr>
+      <td width="120">
+        <img style="cursor: default;" src="{% media  "/media/images/vote-arrow-up-on.png" %}" alt="{% trans "thumb up" %}" />
+        <span title="{% trans "user has voted up this many times" %}" class="vote-count">{{up_votes}}</span>
+	
+      </td>
+      <td width="120">
+        <img style="cursor: default;" src="{% media  "/media/images/vote-arrow-down-on.png" %}" alt="{% trans "thumb down" %}" />
+        <span title="{% trans "user voted down this many times" %}" class="vote-count">{{down_votes}}</span>
+	
+      </td>
+    </tr>
+  </table>
+</div>
+<br clear="all"/>
+{%endif%}
+
+{%if user_tags %}
+<a name="tags"></a>
+{% spaceless %}
+<h2>
+  {% blocktrans count user_tags|length as counter %}
+  <span class="count">{{counter}}</span> 个标签
+  {% plural %}
+  <span class="count">{{counter}}</span> 个标签
+  {% endblocktrans %}
+</h2>
+{% endspaceless %}
+<div class="user-stats-table">
+  <table class="tags">
+    {% for tag in user_tags%}
+    {% if forloop.counter|add:"-1"|divisibleby:"4" %} <tr></tr>{% endif %}
+    <td valign="top" style="padding-right: 100px;">
+      <a rel="tag" 
+         class="post-tag tag-link-{{ tag.name }}"
+	 title="{% blocktrans with tag.name as tag_name %}see other questions with {{view_user}}'s contributions tagged '{{ tag_name }}' {% endblocktrans %}"
+	 href="{% url tag_questions tag|urlencode %}?user={{view_user.username}}">{{tag.name}}</a>
+      <span class="tag-number">&#215; {{ tag.user_tag_usage_count|intcomma }}</span><br/>
+    </td>
+    {% endfor %}
+  </table>
+</div>
+<br clear="all"/>
+{%endif%}
+{%if total_awards%}
+{% spaceless %}
+<h2>
+  {% blocktrans count total_awards as counter %}
+  <span class="count">{{counter}}</span> 个勋章
+  {% plural %}
+  <span class="count">{{counter}}</span> 个勋章
+  {% endblocktrans %}
+</h2>
+{% endspaceless %}
+<div class="user-stats-table">
+  <table>
+    {% for award, count in awards %}
+    {% if forloop.counter|add:"-1"|divisibleby:"4" %}<tr></tr>{% endif %}
+    <td style="padding-right: 60px;">
+      <a href="{% url badges %}{{award.id}}/{{award.name|slugify}}" title="{{ award.description }}" class="medal"><span class="badge{{ award.type }}">&#9679;</span>&nbsp;{{ award.name }}</a><span class="tag-number"> &#215; {{ count|intcomma }}</span><br/>
+    </td>
+    {% endfor %}
+  </table>
+</div>
+{%endif%}
+{% endblock %}
+<!-- end user_stats.html -->

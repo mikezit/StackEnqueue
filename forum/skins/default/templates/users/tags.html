@@ -1,0 +1,30 @@
+{% extends "user.html" %}
+
+{% load i18n %}
+{% load humanize %}
+{% load extra_tags %}
+{% load user_tags %}
+{% block usercontent %}
+<div class="subheader" >
+{% include "users/tabsb.html" %}
+</div>
+<div style="margin-top:10px;font-size:13px;">
+  {%if tags|length  %}
+  <h2>关注的标签:</h2>
+  {%endif%}
+  <table class="tags">
+    <tbody>
+      {% for tag in tags %}
+      {% if forloop.counter|add:"-1"|divisibleby:"4" %} <tr></tr>{% endif %}
+      <td valign="top" style="width:180px;padding-right: 80px;">
+       <a rel="tag" 
+         class="post-tag tag-link-{{ tag.name }}"
+	 title="{% blocktrans with tag.name as tag_name %}see other questions with {{view_user}}'s contributions tagged '{{ tag_name }}' {% endblocktrans %}"	 href="{% url tag_questions tag|urlencode %}?user={{view_user.username}}">{{tag}}</a>
+       <a class="ajax-command tm-sub-links  subscription_switch" href="/subscribe_tag/{{ tag }}" style="color:#555555;">{%if tag in vistor_tags%}{%if vistor == view_user %}取消关注{%else%}你已经关注{%endif%}{%else%}{%if vistor != view_user %}我也要{%endif%}关注{%endif%}</a>
+      </td>
+      {% endfor %} 
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+

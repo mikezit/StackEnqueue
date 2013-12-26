@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+<!-- questions.html -->
+{% load question_list_tags %}
+{% load i18n %}
+{% load extra_tags %}
+{% load node_tags %}
+{% load general_sidebar_tags %}
+{% load ui_registry  extra_filters markup %}
+
+{% block forejs %}
+<script type='text/javascript' src='{% media  "/media/js/suggest-post.js" %}'></script>
+<script type="text/javascript">
+  $().ready(function(){
+    StackPointer.tag.init();
+  });
+</script>
+{%endblock%}
+
+{% block title %}{% spaceless %}'{{tag.name}}'标签{% endspaceless %}{% endblock %}
+
+{% block meta %}
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ feed_url }}" />
+{% endblock %}
+
+{% block content %}
+<div class="subheader">
+  <h1>标签内容</h1>
+</div>
+<div style="margin-top:10px;font-size:13px;">
+<h2>关于  <a href="/tags/{{ tag.name }}" class="post-tag" title="show questions tagged '{{ tag.name }}'" rel="tag">{% spaceless %}{%if tag.sponsor_tag_img %}<img src="{{tag.sponsor_tag_img}}" height="16" width="18" alt class="sponsor-tag-img" >{%endif%}{{ tag.name }}{% endspaceless %}</a> </h2>
+
+{% if not tag.about %}
+<div class="post-text" style="width:auto">
+<p>标签 Wiki 里面还没有此标签!</p>
+<p>标签 wikis 帮助新来者了解此标签，wiki里面包含了此标签的概述,同时介绍了它的用处。</p>
+<p>所有的注册用户都可以编辑标签wiki。</p>
+</div>
+{% else %}
+
+<div class="welovestackpointer" style="margin-top: 10px;"> 
+  <div style="float: left;"> 
+    {% if tag.pendding_suggestion and tag.suggested.by == request.user %}
+     {{ tag.pendding_suggestion.about|static_content:settings.ANNOUNCEMENT_BAR_RENDER_MODE|safe }}
+    {%else%}
+    <p>{{ tag.about }}</p>
+    {%endif%}
+  </div>
+</div>
+
+<div class="post-text" style="width:auto">
+    {% if tag.pendding_suggestion and tag.suggested.by == request.user %}
+     {{ tag.pendding_suggestion.detail|static_content:settings.ANNOUNCEMENT_BAR_RENDER_MODE|safe }}
+    {%else%}
+    {{ tag.detail|static_content:settings.ANNOUNCEMENT_BAR_RENDER_MODE|safe }}
+    {%endif%}
+</div>
+
+{% endif %}
+
+{% if request.user.is_authenticated  %}
+{% if request.user.can_edit_tag and tag.pendding_suggestion %}
+<br>
+<div class="post-controls">
+<a id="edit-pending-{{tag.id}}/tag" style="color:#333;" href="#" class="submit">编辑(0)</a>
+</div>
+<br>
+{%else%}
+  {%if not tag.pendding_suggestion or tag.pendding_suggestion and tag.suggested.by == request.user %}
+  <form method="get" action="#" class="form-submit"> 
+    <input type="button" value="{%if not tag.about%}编辑{% else %}修改{% endif %}标签" onclick="window.location.href='/tag/{{tag.id}}/edit/'" /> 
+  </form> 
+  {%endif%}
+ {%endif%}
+<a href="/revisions/{{tag.id}}/tag/">历史版本</a>
+</div> 
+{% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div class="module boxD">
+  <h2>状态</h2>
+  <table>
+    <tbody>
+      <tr>
+	<td><p class="label-key">创建</p></td>
+	<td><p class="label-key"><b>{% join_date tag.created_at %}</b></p></td>
+      </tr>
+      <tr>
+	<td><p class="label-key">查看</p></td>
+	<td><p class="label-key"><b>{{tag.view_times}}次</b></p></td>
+      </tr>
+      <tr>
+	<td><p class="label-key">使用</p></td>
+	<td><p class="label-key"><b>{{tag.used_count}}次</b></p></td>
+      </tr>
+      {% if tag.last_edited %}
+      <tr>
+	<td><p class="label-key">活动</p></td>
+	<td><p class="label-key"><b>{% join_date tag.last_edited.action_date %}</b></p></td>
+      </tr>
+      {% endif %}
+      <tr>
+	<td><p class="label-key">编辑</p></td>
+	<td><p class="label-key"><b>{{editors}}人</b></p></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="module boxD">
+  <h2>领先回答者</h2>  
+  {% for author in top_answerers%}
+  <div style="margin-bottom:5px">
+  {% author_info author %}
+  </div>
+  {% endfor %}
+</div>
+<div class="module boxD">
+  <h2>最热问题</h2>
+  {% for question in hot_questions %}
+  <a href="{{question.get_absolute_url}}" style="color: #555;font-weight:bold">{{question.title}}</a>
+  <br>
+  <br>
+  {% endfor%}
+</div>
+{% endblock %}
+<!-- end questions.html -->

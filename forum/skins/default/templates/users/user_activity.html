@@ -1,0 +1,49 @@
+{% load extra_tags %}
+{% load humanize %}
+{% load extra_tags %}
+{% load i18n %}
+
+<tr>
+  <td>
+    <div class="date">
+      <div class="date_brick" title=" {% diff_date action.action_date  %}">
+	{{ action.action_date.month }}月{{ action.action_date.day }}日
+    </div>
+  </td>
+  <td>
+    <span 
+       {% if action.action_type == "ask" %}
+       style="font-weight: bold;" 
+       {% else %} 
+         {% if  action.action_type == "answer" %}
+         style="font-weight: bold;color: #508850 !important;"
+         {% else %}
+           {% if  action.action_type == "revise" or action.action_type == "close" %}
+           style="color:maroon;"
+           {% else%}
+             {% if action.action_type == "award" %}
+               style="font-weight: bold;color:#FFCC00;"       
+             {% endif %}
+           {% endif %}
+         {% endif %}
+       {% endif %}
+       >
+      {% trans action.action_type %}
+    </span>
+  </td>
+  <td {% if action.action_type != "userjoins" and action.action_type != "editprofile" and action.action_type != "comment" and action.action_type != "award" and action.action_type != "close" and action.action_type != "suggestaccept" and action.action_type != "suggestreject" and action.action_type != "tagrevise" and action.action_type != "tagsuggestaccept" and action.action_type != "tagsuggestreject" and action.action_type != "tagsuggest"%} 
+      class="async-load load-prepped" id="enable-load-body-{{action.id}}"
+      {% endif %}
+      >
+      <b>{{ target }}</b>
+
+      {% if action.action_type == "comment" %}
+      <div class="comments">{{action.node.leaf.html|safe}}</div>
+      {% endif %}
+      {% if action.action_type == "revise" and action.summary%}
+      <br>
+      <span class="revision-comment">{{action.summary}}</span>
+      {% endif %}
+
+  </td>
+</tr>

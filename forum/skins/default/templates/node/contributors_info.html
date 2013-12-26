@@ -1,0 +1,22 @@
+{% load extra_tags i18n %}
+<div class="user-info user-hover">
+  <div class="user-action-time">
+    {{ node_verb }} <span class="relativetime">{% diff_date added_time %}</span>
+  </div>
+  <div class="user-gravatar32">
+	<a href="{{ author.get_profile_url }}">      
+	  <div class="">
+	    {% gravatar author 32 %}
+	  </div>
+	</a>
+  </div>
+  <div class="user-details">
+    <a {% if author.is_suspended %}class="suspended-user" {% endif %}href="{{ author.get_profile_url }}">{{ author.decorated_name }}</a><br/>
+    {% get_reputation author %}
+    {% get_score_badge author %}
+    {% get_accept_rate author %}
+  </div>
+</div>
+
+
+

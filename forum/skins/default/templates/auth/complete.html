@@ -1,0 +1,160 @@
+{% extends "question_base.html" %}
+<!-- complete.html -->
+{% load i18n %}
+{% block head %}{% endblock %}
+{% block title %}注册{% endblock %}
+{% block topcontent%}
+<div class="subheader" >
+    <h1> {% trans "New user signup" %}</h1>
+</div>      
+{% endblock%}
+{% block content %}
+<!--
+<div id="completetxt" >
+  <div class="message">
+    {# Only display the OpenID greeting if a provider is detected. #}
+    {% if provider %}
+    <p>
+      <b>{% trans "You are here for the first time with " %}{{ provider }}</b>
+    </p>
+    {% endif %}
+    <p>
+      {% trans "Please choose your screen name and confirm your email address. A valid email address is necessary to receive notifications about activity in the areas of this community you're most interested in, and will help you become an involved participant in this community." %}
+    </p>
+  </div>
+  <p style="display:none">{% trans "This account already exists, please use another." %}</p>
+</div>
+-->
+{% if form1.errors %}
+<ul class="errorlist">
+  {% if form1.non_field_errors %}
+  {% for error in form1.non_field_errors %}
+  <li>{{error}}</li>
+  {% endfor %}
+  {% endif %}
+</ul>
+{% endif %}
+
+	<div class="login">
+        <form name="fregister" action="" method="POST">
+            {{ form1.next }}
+	    <table>
+	      <tbody>
+		<tr>
+		  <td>
+                    <label for="id_username">{{ form1.username.label }}</label>
+		  </td>
+		  <td>
+                    {{ form1.username }}
+		  </td>
+		  <td>
+                    {% if form1.username.errors %} 
+                    <p class="error">{{ form1.username.errors|join:", " }}</p>
+                    {% endif %}
+		  </td>
+		</tr>
+		<tr>
+		  <td>
+                    <label for="id_email">{{ form1.email.label }}</label>
+		  </td>
+		  <td>
+                    {{ form1.email }}
+		  </td>
+		  <td>
+                    {% if form1.email.errors %} 
+                    <p class="error">{{ form1.email.errors|join:", " }}</p>
+                    {% endif %}
+		  </td>
+		</tr>
+		{% if form1.password1 %}
+		<tr>
+		  <td>
+                    <label for="password1_id">{{ form1.password1.label }}</label>
+		  </td>
+		  <td>
+                    {{ form1.password1 }}
+		  </td>
+		  <td>
+                    {% if form1.password1.errors %}
+                    <p class="error">{{ form1.password1.errors|join:", " }}</p>
+                    {% endif %}
+		  </td>
+		</tr>
+		<tr>
+		  <td>
+                    <label for="password2_id">{{ form1.password2.label }}</label>
+		  </td>
+		  <td>
+                    {{ form1.password2 }}
+		  </td>
+		  <td>
+                    {% if form1.password2.errors %} 
+                        <p class="error">{{ form1.password2.errors|join:", " }}</p>
+                    {% endif %}
+		  </td>
+		</tr>
+		{% endif %}
+		{% if captcha %}
+		<tr>
+		  <td>
+		    <label for="captcha_id">{% trans "Captcha" %}</label>
+		  </td>
+		  <td>
+		    {{ captcha.captcha }}
+		  </td>
+		  <td>
+		    {% if captcha.errors %} 
+		    <p class="error">{% trans "Invalid CAPTCHA" %}</p>
+		    {% endif %}
+		  </td>
+		</tr>
+		{% endif %}
+		<tr>
+		  <td></td>
+		  <td>
+		    <div class="submit-row" style="float:right">
+		      <input type="submit" class="submit" name="bnewaccount" id="bnewaccount" value="{% trans "create account" %}"/>
+		    </div>
+		  </td>
+		  <td></td>
+		<tr>
+	      </tbody>
+	    </table>
+            
+        </div>
+	</form>
+
+
+    {% comment %}<!-- this form associates openID with an existing password-protected account, not yet functional -->
+    {% if form2 %}
+	<div class="login" style="display:none">
+        <form name="fverify" action="{% url user_register %}" method="POST">
+            {{ form2.next }}
+			<fieldset style="padding:10px">
+				<legend class="big">{% trans "Existing account" %}</legend>
+				<div class="form-row"><label for="id_username">{% trans "user name" %}</label><br/>{{ form2.username }}</div>
+				<div class="form-row"><label for="id_passwordl">{% trans "password" %}</label><br/>{{ form2.password }}</div>
+                <p><span class='big strong'>(Optional) receive updates by email</span> - only sent when there are any.</p>
+				<!--todo double check translation from chinese 确认 = "Register" -->
+				<div class="submit-row">
+					<input type="submit" class="submit" name="bverify" value="{% trans "Register" %}"/> 
+					<a href="{% url user_sendpw %}">{% trans "Forgot your password?" %}</a>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+    {% endif %}
+    {% endcomment %}
+{% endblock %}
+
+{% block sidebar%}
+	<div style="margin-top:14px" class="newask module">
+	  <p class="subtitle darkred">使用OpenID</p>
+	  <p>你还可以使用Google或者Yahoo等OpenID登录</p>
+	  <p class="ar">
+	    <a href="/account/signin/">使用OpenID &raquo; </a><br/>
+	    <a href="http://zh.wikipedia.org/zh-cn/OpenID">了解更多</a>
+	  </p>
+	</div>
+{% endblock%}
+<!-- end complete.html -->

@@ -1,0 +1,49 @@
+{% load email_tags %}
+{% load node_tags %}
+{% load extra_tags %}
+{% load extra_filters %}
+{% load general_sidebar_tags %}
+{% load smart_if %}
+{% load humanize %}
+{% load i18n %}
+{% load cache %}
+
+{% declare %}
+    exclude_greeting = True
+    prefix = html.mark_safe(smart_str(settings.EMAIL_SUBJECT_PREFIX))
+    app_name = smart_unicode(settings.APP_SHORT_NAME)
+    app_url = settings.APP_URL
+{% enddeclare %}
+
+{% email %}
+    {% subject %}{% blocktrans %}{{ prefix }} 邀请 {% endblocktrans %}{% endsubject %}
+
+{% htmlcontent notifications/base.html %}
+
+{% declare %}
+exclude_greeting = True
+exclude_finetune = True
+new_questions_link = html.hyperlink(smart_unicode(app_url) + reverse('questions') + '?sort=' + _('latest'), smart_unicode(_('new questions')), style=a_style)
+{% enddeclare %}
+
+<style type="text/css">
+#.invitation p {padding-left:15px}
+</style>
+
+{{ settings.APP_INVATATION|static_content:settings.ANNOUNCEMENT_BAR_RENDER_MODE|safe }}
+
+{% endhtmlcontent %}
+
+{% textcontent notifications/base_text.html %}
+{% blocktrans %}This is a brief of what's going on the {{ app_name }} community since our last update.{% endblocktrans %}
+
+{% if new_member_count %}
+{% if show_all_users %}
+{% blocktrans %}There are {{ new_member_count }} new members in the community. {{ new_member_links }} were the most active so far.{% endblocktrans %}
+{% else %}
+{% blocktrans %}{{ new_member_links }} have joined the {{ app_name }} community.{% endblocktrans %}
+{% endif %}
+{% endif %}
+
+{% endtextcontent %}
+{% endemail %}

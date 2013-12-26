@@ -1,0 +1,31 @@
+{% load question_list_tags %}
+{% load i18n %}
+{% load extra_tags %}
+{% load general_sidebar_tags %}
+{% load ui_registry  extra_filters markup %}
+
+    <div class="um-header">
+        <div class="um-gravatar">
+	  <a href="{{ user.get_profile_url }}">
+	    <div class="">
+	      {% gravatar user 48 %}
+	    </div>
+	  </a>
+	</div>
+	<div class="um-header-info">
+	  <a href="{{ user.get_profile_url }}" class="um-user-link">{{ user.decorated_name }}</a><br />
+	  <div class="um-flair">
+	    {% get_reputation user %}
+	    {% get_score_badge user %}<br>
+	    {% get_location user %}<br>
+	    <a href="{{ user.website}}" rel="nofollow">{{ user.website}}</a>
+	</div>
+
+        <div class="um-about-me"> 
+	  <!-- this should be carea-->
+	  {{ user.about|static_content:settings.ANNOUNCEMENT_BAR_RENDER_MODE|safe }}
+	</div>
+    </div>
+    <span class="um-links">
+<!--        <a href="http://jqpresentation.slaks.net/Demos/Introducing-jQuery/" rel="nofollow">jQuery tutorial</a> <a href="http://stackoverflow.com/questions/2508945/can-anyone-explain-this-strange-behaviour/2509174#2509174" rel="nofollow">Tracking down a...</a> <a href="http://stackoverflow.com/questions/1563516/um-proggy-not-worky/1563668#1563668" rel="nofollow">An exercise in ...</a> -->
+    </span>

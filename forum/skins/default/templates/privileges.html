@@ -1,0 +1,46 @@
+{% extends "question_base.html" %}
+<!-- privileges.html -->
+{% load i18n %}
+{% load general_sidebar_tags %}
+{% load ui_registry  extra_filters markup %}
+
+{% block title %}权限{%if select_priv%}-{% trans title %}{%endif%}{% endblock %}
+
+{% block meta %}
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ feed_url }}" />
+{% endblock %}
+
+{% block topcontent %}        
+<div class="question-header">
+    <h1><a href="{{ question.get_absolute_url }}">
+	{% trans title %}
+    </a></h1>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="post-text" style="width:auto">
+{{desc|markdown:"settingsparser" }}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div class="module">
+   <h2>{% if select_priv %}声誉要求{%else%}你的声誉{%endif%}</h2>
+   <div style="color: #808185;font-size: 350%;font-weight: bold;">
+     {{current_value}} </div>
+</div>
+<div class="module">
+  <h2>权限列表</h2>
+  <br>
+  <div class="related">
+    {% for priv in privileges %}
+    <div class="spacer">
+      <a href="/privileges/{{priv.href}}" title="需要{{priv.value}}的声誉" {%if priv.here %}class="strong"{%endif%}>{% trans priv.name %}</a>
+      <div class="fr progress" title={%if priv.proc < 100 %}"你已经得到{{priv.proc}}%的声誉来启动这个权限"{%else%}"你已经有这个权限"{%endif%}>{{priv.proc}}%</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+<!-- end questions.html -->

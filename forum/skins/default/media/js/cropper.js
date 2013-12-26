@@ -1,0 +1,50 @@
+(function($){
+    var cropbox = $('#cropbox'),
+    preview = $('#preview'),
+    cropboxHeight = cropbox.height(),
+    cropboxWidth  = cropbox.width(),
+    previewHeight = preview.closest('DIV').height(),
+    previewWidth  = preview.closest('DIV').width() ;
+
+    var showPreview = function(coords)
+    {
+        $(['x', 'y', 'w', 'h']).each(function(){
+            $('#id_' + this).val(coords[this]);
+        });
+
+        if (parseInt(coords.w) > 0)
+        {
+            var rx = previewWidth  / coords.w;
+            var ry = previewHeight / coords.h;
+
+            preview.css({
+                width  : Math.round(rx * cropboxWidth  ) + 'px',
+                height : Math.round(ry * cropboxHeight ) + 'px',
+                marginLeft : '-' + Math.round(rx * coords.x) + 'px',
+                marginTop  : '-' + Math.round(ry * coords.y) + 'px'
+            });
+        };
+    };
+
+    $(function(){
+        cropbox.Jcrop({
+            onChange: showPreview,
+            onSelect: showPreview,
+            bgColor   : '#cccccc',
+            bgOpacity : 0.8
+            //   aspectRatio: 1
+        });
+
+        $('#crop-form').submit(function(){
+            $.post(
+                $(this).attr('action'),
+                $(this).serialize(),
+                function(json){
+                }, 'json'
+            );
+            return true;
+        });
+    });
+
+
+})(jQuery);

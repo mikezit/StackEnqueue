@@ -1,0 +1,32 @@
+{% load i18n %}
+ <script type="text/javascript">
+$(document).ready(
+function moveScroller(){
+    var scroller_width=$("#scroller").width();
+    var position_cb=function(){
+	var e=$(window).scrollTop();
+	var scroller_to_top=$("#scroller-toucher").offset().top;
+	var scroller=$("#scroller");
+	if(e >scroller_to_top){
+	    if(scroller.height()>$(window).height()){
+		scroller.css({position:"fixed",top:"",bottom:"0px",width:scroller_width})
+	    }else{
+		scroller.css({position:"fixed",top:"0px",bottom:"",width:scroller_width})
+	    }
+	}else{
+	    if(e<=scroller_to_top){scroller.css({position:"relative",top:"",bottom:""})}
+	}
+    };
+    $(window).scroll(position_cb).resize(position_cb);
+    position_cb()
+});
+</script>
+<div style="margin-top:7px;">
+  <div id="scroller-toucher"></div>
+  <div id="scroller">
+    <div>
+    {% block scontent %}
+    {% endblock %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,31 @@
+{% load i18n extra_tags email_tags %}
+
+{% declare %}
+    prefix = html.mark_safe(smart_str(settings.EMAIL_SUBJECT_PREFIX))
+    exclude_greeting = True
+    app_name = smart_str(settings.APP_SHORT_NAME)
+    safe_app_name = html.mark_safe(smart_str(settings.APP_SHORT_NAME))
+    app_url = smart_str(settings.APP_URL)
+    newmember_name = smart_str(newmember.username)
+    safe_newmember_name = html.mark_safe(smart_str(newmember.username))
+    newmember_url = smart_str(newmember.get_profile_url())
+    newmember_link = html.objlink(newmember, style=settings.EMAIL_ANCHOR_STYLE)
+{% enddeclare %}
+
+{% email %}
+    {% subject %}{% blocktrans %}{{ prefix }} {{ safe_newmember_name }} is a new member on {{ safe_app_name }}{% endblocktrans %}{% endsubject %}
+
+{% htmlcontent notifications/base.html %}
+<p style="{{ p_style }}">
+  {{ newmember_link }}刚刚加入了{{ app_name }}社区.
+  查看 <a style="{{ a_style }}" href="{{ app_url }}{{ newmember_url }}">{{ newmember_name }}的页面</a>.
+</p>
+{% endhtmlcontent %}
+
+{% textcontent notifications/base_text.html %}
+{{ safe_newmember_name }} 刚刚加入了 {{ safe_app_name }}. 你可以访问 {{ safe_newmember_name }}的用户页面:
+{{ app_url }}{{ newmember_url }}
+{% endtextcontent %}
+
+{% endemail %}
+

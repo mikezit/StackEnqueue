@@ -1,0 +1,19 @@
+{% load extra_tags %}
+{% load humanize %}
+{% load extra_tags %}
+{% load i18n %}
+
+<tr>
+  <td>
+    <div class="date">
+      {% diff_date action.action_date  %}
+    </div>
+  </td>
+  <td>
+    <div class="action_container">
+      <div class="action_body">
+        {{ describe }}
+      </div>
+    </div>
+  </td>
+</tr>

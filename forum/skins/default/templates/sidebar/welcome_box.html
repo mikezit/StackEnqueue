@@ -1,0 +1,13 @@
+{% load i18n %}
+
+<div class="boxA" style="height:auto">
+  <p>Hello Stack !</p>
+  <div class="body">
+    <span>栈问网是一个为<b>专业的程序开发者</b>提供的提问和回答的交流站点!</span>
+    <!--{{ settings.APP_INTRO|safe }}-->
+    <br/>                
+    <p class="ar"> 
+      <a href="{% url about %}">{% trans "about" %} &raquo; </a>
+      <a href="/account/local/register/">注册&raquo; </a></p>
+  </div>
+</div>

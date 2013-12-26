@@ -1,0 +1,48 @@
+{% load extra_filters extra_tags i18n email_tags %}
+
+{% declare %}
+    p_style = smart_str(settings.EMAIL_PARAGRAPH_STYLE)
+    a_style = smart_str(settings.EMAIL_ANCHOR_STYLE)
+    content_style = "font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#666666;padding:0px 0px 0px 0px"
+    hr_style = "color:#ccc;border:0;height:1px;background-color:#ccc;margin-bottom:20px;"
+    small_style = "color:#999999;font-family:normal normal normal 12px/normal Arial, Helvetica, sans-serif;font-size:12px;"
+    table_style = "border:1px %s solid;margin:12px auto 10px auto;width:750px;text-align:left;color:#000000" % settings.EMAIL_BORDER_COLOR
+{% enddeclare %}
+<html>
+<head>
+<base href="{{ settings.APP_URL }}">
+</head>
+<body style="margin:0;">
+<center>
+<table style="{{ table_style }}">
+<tbody><tr><td style="padding:20px;">
+<!--<a href="{{ settings.APP_URL }}" style="border: 0;"><img class="maillogo" src="{{ settings.APP_URL }}{{ settings.APP_LOGO }}" alt="{{settings.APP_TITLE}}" border="0"/></a>-->
+
+<div style="background:#ffffff;padding-bottom:20px;border-bottom:0px solid #ccc;">
+<a href="{{ settings.APP_URL }}"><img height=50 width=222 src="{{ settings.APP_URL }}/upfiles/logo.png"></a>
+</div>
+
+{% if not exclude_greeting %}
+<p style="{{ p_style }}">{% trans "Hello" %} {{ recipient.username }}</p>
+{% endif %}
+
+<div style="{{ p_style }}">
+{% block content %}{% endblock%}
+</div>
+
+<hr style="{{ hr_style }}" />
+<small style="{{ small_style }}">
+  随时欢迎您对我们的服务进行<a href="{{ settings.APP_URL }}/contact/">反馈</a>,{{settings.APP_SHORT_NAME}}致力于高质量的问答服务。
+<!--  {% if not exclude_finetune %}-->
+  <p style="{{ small_style }}">你可以在
+    <a href="{{ settings.APP_URL }}{% url user_subscriptions id=recipient.id,slug=recipient.username|slugify %}" style="{{ a_style }}">这里</a> 随时更改您的消息通知设置.
+  </p>
+  <br/>
+  {{ settings.EMAIL_FOOTER_TEXT }}
+<!--{% endif %}-->
+</small>
+
+</td></tr></tbody></table>
+</center>
+</body>
+</html>

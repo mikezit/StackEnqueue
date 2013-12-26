@@ -1,0 +1,117 @@
+{% extends "base_content.html" %}
+<!-- users.html -->
+{% load extra_tags %}
+{% load humanize %}
+{% load i18n %}
+{% block title %}{% spaceless %}{% trans "Users" %}{% endspaceless %}{% endblock %}
+{% block forestyle%}
+   <style type="text/css">
+        .user-info
+        {
+    	    clear:both;
+    	    height: 85px;
+            width: 230px;
+            margin: 8px 5px;
+        }
+        .user-info .user-gravatar48
+        {
+            float: left;
+            width: 48px;
+            height: 48px;
+        }
+        .user-info .reputation-score {
+            font-size: 110%;
+	font-weight: bold;
+            margin-right:0px;
+        }
+        .user-info .user-tags {
+            clear: both;
+        }
+        .subtabs a { font-size: 100%; }
+        .no-search-results { font-weight: bold; font-size: 120%; padding: 20px; }
+        
+        .user-info
+        {
+            overflow:hidden;
+        }
+        .user-tags, .user-tags a
+        {
+            color: #888;            
+        }
+        .user-tags
+        {
+            font-family: Arial,Liberation Sans,DejaVu Sans,sans-serif;  
+            font-size: 13px;
+            margin-left: 53px;
+        }
+        .user-details
+        {
+            width: 175px !important;
+        }
+        #user-browser table td { vertical-align:top; }
+    </style>
+{% endblock %}
+{% block forejs %}
+       <script type="text/javascript">
+	   //todo move javascript out
+        $().ready(function(){
+            $("#type-user").attr('checked',true);
+            var orderby = "{{ tab_id }}";
+            $("#sort_" + orderby).attr('className',"on");
+            
+            Hilite.exact = false;
+            Hilite.elementid = "main-body";
+            Hilite.debug_referrer = location.href;
+        });
+        </script>
+{% endblock %}
+{% block content %}
+<div class="subheader">
+    <div class="headQuestions">{% trans "Users" %}</div>
+    {{ users.paginator.sort_tabs }}
+</div>
+<div id="main-body" style="width:100%">
+    <p>        
+        {% if suser %}
+			{% blocktrans %}users matching query {{suser}}:{% endblocktrans %}
+        {% endif %}
+    
+        {% if not users.paginator.count %}
+            <span>{% trans "Nothing found." %}</span>
+        {% endif %}
+    </p>
+    <div class="userList">
+      <table>
+        {% for user in users.paginator.page %}
+ 	{% if forloop.counter|add:"-1"|divisibleby:"4" %} </tr><tr> {% endif %}
+	  <td>
+            <div class="user-info user-hover">
+	      <div class="user-gravatar48">
+		<a href="{{ user.get_profile_url }}">      
+		  <div class="">
+		  {% gravatar user 48 %}
+		  </div>
+		</a>
+	      </div>
+              <div class="user-details">
+		<a {% if user.is_suspended %}class="suspended-user" {% else %}class="normal-user" {% endif %}href="{{ user.get_profile_url }}">{{ user.decorated_name }}</a><br>
+		{% get_location user %}<br>
+		{% get_reputation user %}<br>
+	      </div> 
+              <div class="user-tags">
+		{% get_tags user %}
+	      </div>
+	      <!--                <div> {% get_score_badge user %}</div> -->
+            </div>
+	  </td>
+        {% endfor %}
+      </table>
+    </div>
+</div>
+{% endblock %}
+{% block tail %}
+<div class="pager">
+    {{ users.paginator.page_numbers }}
+</div>              
+{% endblock %}
+<!-- end users.html -->

@@ -1,0 +1,73 @@
+{% load i18n humanize extra_filters extra_tags user_tags %}
+<div class="short-summary {%if user_like_question %}tagged-interesting{%endif%}">
+  <div class="statscontainer">
+    <div class="statsarrow"></div>
+    <div class="stats">
+      <div class="counts">
+	{% if favorite_count %}
+	<div class="favorites">
+	  <span class="favorite-mark{% if question.favourite_count %} on{% endif %}"></span>
+	  <div class="item-count">{{question.favourite_count|intcomma}}</div>
+	</div>
+	{% endif %}
+	<div class="vote">
+	  <div class="votes">
+	    <span class="vote-count-post"><span>{{question.score|intcomma}}</span></span>
+	    <div>{% trans "votes" %}</div>
+	  </div >
+	</div>
+	<div {% if question.accepted_count %}title="{% trans "this question has an accepted answer" %}"{% endif %} class="status {% if question.accepted_count %}answered-accepted{% endif %} {% ifequal question.answer_count 0 %}unanswered{% endifequal %}{% ifnotequal question.answer_count 0 %}answered{% endifnotequal %}">
+	  <strong >{{question.answer_count|intcomma}}</strong>
+	  <div>{% ifequal question.answer_count 1 %}{% trans "answer" %}{% else %}{% trans "answers" %}{% endifequal %}</div>
+	</div>
+      </div>
+    </div>
+    <div class="views hot">
+	{{question.view_count|decorated_int|safe}}{% ifequal question.view_count 1 %}{% trans "view" %}{% else %}{% trans "views" %}{% endifequal %}
+    </div>
+
+  </div>
+
+  <div class="question-summary-wrapper">
+    <h2><a class="question-hyperlink" href="{{ question.get_absolute_url }}">{{question.headline}}</a></h2>
+
+    <div class="questionexcerpt">
+      {{ question.summary }}
+    </div>
+
+    <div class="started fr">
+    <div class="user-info user-hover">
+      <div class="user-action-time">
+        {% trans "asked" %}
+        <span class="relativetime">{% diff_date question.added_at %}</span>
+      </div>
+      <div class="user-gravatar32">
+	<a href="{{ question.author.get_profile_url }}">      
+	  <div class="">
+	    {% gravatar question.author 32 %}
+	  </div>
+	</a>
+      </div>
+      <div class="user-details">
+	<a  href="{{ question.author.get_profile_url }}">{{ question.author.decorated_name }}</a><br/>	
+	{% get_reputation question.author %}
+	{% get_score_badge question.author %} 
+	<!--{% get_accept_rate2 question.author %}-->
+      </div>
+
+    </div>
+    </div>
+
+    <!-- <div class="userinfo">
+	 <span class="relativetime" title="{{question.last_activity_at}}">{% diff_date question.last_activity_at %}</span>
+	 {% if question.last_activity_by %}{% user_signature question.last_activity_by signature_type %}{% endif %} 
+    </div>
+    -->
+    <div class="tags">
+      {% for tag in question.tags.all %}
+      <a class="post-tag tag-link-{{ tag.name }}" href="{% url tag_questions tag.name|urlencode %}" title="{% trans "see questions tagged" %} '{{ tag.name }}'" rel="tag">{% spaceless %}{%if tag.sponsor_tag_img %}<img src="{{tag.sponsor_tag_img}}" height="16" width="18" alt class="sponsor-tag-img" >{%endif%}{{ tag.name }}{% endspaceless %}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>

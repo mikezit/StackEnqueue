@@ -1,0 +1,70 @@
+{% extends "base_content.html" %}
+<!-- tags.html -->
+{% load i18n %}
+{% load extra_tags %}
+{% load humanize %}
+{% block title %}{% spaceless %}{% trans "Tag list" %}{% endspaceless %}{% endblock %}
+{% block forejs %}
+       <script type="text/javascript">
+       /*<![CDATA[*/
+        $().ready(function(){
+            $("#ipSearchTag").focus();
+
+            var orderby = "{{ tab_id }}";
+            if(orderby != "used" && orderby != "name")
+                orderby = "used";
+            $("#sort_" + orderby).attr('className',"on");
+            $("#type-tag").attr('checked',true);
+
+            Hilite.exact = false;
+            Hilite.elementid = "searchtags";
+            Hilite.debug_referrer = location.href;
+        });
+        /*]]>*/
+        </script>
+{% endblock %}
+{% block content %}
+<!-- Tabs -->
+<div class="subheader">
+    <div class="headQuestions">{% trans "Tag list" %}</div>
+    {{ tags.paginator.sort_tabs }}
+</div>
+<div id="searchtags">
+<p>
+{% if stag %}
+    {% trans "All tags matching query" %} '<span class="darkred"><strong>{{ stag }}</strong></span>':
+{% endif %}
+{% if not tags.paginator.count %}
+    <span>{% trans "Nothing found" %}</span>
+{% endif %}
+</p>
+{% if tags.paginator.count %}
+<div class="tagsList tags">
+<table>
+{% for tag in tags.paginator.page %}
+{% if forloop.counter|add:"-1"|divisibleby:"4" %} </tr><tr> {% endif %}
+
+   <td class="tag-cell">
+     <a class="post-tag tag-link-{{ tag }}" href="{% url tag_questions tag|urlencode %}" title="{% trans "see questions tagged" %}'{{ tag }}'{% trans "using tags" %}" rel="tag">{{ tag }}</a>&nbsp;
+     <span class="tag-number">&#215; {{ tag.used_count|intcomma }}</span>
+     {% if tag.about%}
+     <div class="excerpt">{{tag.about}}</div>
+     {% endif %}
+     <div>
+       <div class="stats-row fl"></div>
+       <div class="cbt"></div>
+     </div>
+   </td>
+{% endfor %}
+</table>
+</div>
+{% endif %}
+</div>
+
+{% endblock %}
+{% block tail %}
+<div class="pager">
+    {{ tags.paginator.page_numbers }}
+</div>              
+{% endblock %}
+<!-- end tags.html -->

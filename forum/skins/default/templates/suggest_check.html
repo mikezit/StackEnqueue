@@ -1,0 +1,192 @@
+{% load node_tags %}
+{% load extra_tags %}
+{% load extra_filters %}
+{% load humanize %}
+{% load i18n %}
+<div id="rejection-prototype" style="display:none">
+    <div class="popup-close"><a title="close this popup (or hit Esc)">&times;</a></div>
+    <div class="popup-tab-content">
+        <form method="post" action="/suggested-edits/reject">
+             <h2>Why are you rejecting this edit?</h2>
+            <ul class="action-list">
+                    <li>
+                        <input id="reason-5" name="rejection-reason" class="static-reason" type="radio" value="5">
+                        <label for="reason-5" class="action-label">
+                            <span class="action-name">copied content</span>
+                            <span class="action-desc">
+                                This edit plagiarizes content from an external source without proper attribution.
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                            <input name='post-type-id' value='4' type='hidden'/>
+                        <input id="reason-7" name="rejection-reason" class="static-reason" type="radio" value="7">
+                        <label for="reason-7" class="action-label">
+                            <span class="action-name">excerpt not helpful</span>
+                            <span class="action-desc">
+                                This edit does not follow any of our <a href='http://blog.stackoverflow.com/2011/03/redesigned-tags-page/'>tag wiki guidelines</a> and is unlikely to help instruct future visitors in the appropriate use of the tag.
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                        <input id="reason-4" name="rejection-reason" class="static-reason" type="radio" value="4">
+                        <label for="reason-4" class="action-label">
+                            <span class="action-name">invalid edit</span>
+                            <span class="action-desc">
+                                This edit is incorrect or an attempt to reply to or comment on the existing post.
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                        <input id="reason-1" name="rejection-reason" class="static-reason" type="radio" value="1">
+                        <label for="reason-1" class="action-label">
+                            <span class="action-name">radical change</span>
+                            <span class="action-desc">
+                                This edit changes too much in the original post; the original meaning or intent of the post would be lost.
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                        <input id="reason-3" name="rejection-reason" class="static-reason" type="radio" value="3">
+                        <label for="reason-3" class="action-label">
+                            <span class="action-name">too minor</span>
+                            <span class="action-desc">
+                                This edit is too minor; suggested edits should be substantive improvements addressing multiple issues in the post.
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                        <input id="reason-2" name="rejection-reason" class="static-reason" type="radio" value="2">
+                        <label for="reason-2" class="action-label">
+                            <span class="action-name">vandalism</span>
+                            <span class="action-desc">
+                                This edit introduces spam, defaces the post in some way, or is otherwise inappropriate.
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                            <input name='post-type-id' value='5' type='hidden'/>
+                        <input id="reason-6" name="rejection-reason" class="static-reason" type="radio" value="6">
+                        <label for="reason-6" class="action-label">
+                            <span class="action-name">wiki not helpful</span>
+                            <span class="action-desc">
+                                This edit does not follow any of our <a href='http://blog.stackoverflow.com/2011/03/redesigned-tags-page/'>tag wiki guidelines</a> and is unlikely to help instruct future visitors in the appropriate use of the tag.
+                            </span>
+                        </label>
+                    </li>
+                <li>
+                    <input id="reason-custom" name="rejection-reason" type="radio" value="-1">
+                    <label for="reason-custom" class="action-label">
+                        <span class="action-name">custom</span>
+                        <textarea class='custom-reason-text' name="custom-reason" cols="80" rows="3" style="display:block;margin-left:17px;margin-top:5px;"></textarea>
+                        <span class="edit-field-overlay">Explain clearly why you are rejecting the edit.</span>
+                        <span style="display:block;margin-left:17px;" class="text-counter"></span>
+                    </label>
+                </li>
+            </ul>
+            
+            <div style="float:left; margin-top:18px;"> 
+                <a href="javascript:void(0)" class="popup-actions-cancel">cancel</a> 
+            </div>
+            <div style="float:right"> 
+                <input type="submit" value="Reject" style="float:none; margin-left:5px;" class="popup-submit"> 
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- up is a form -->
+
+<div id="suggested-edit-{{post.id}}" class="answer-summary question-summary suggested-edit post-type-id-1">
+    <div class="post-id" style="display:none">{{post.id}}</div>
+    <div class="statscontainer">
+        <span class="score" title="这次编辑的得分">2</span>
+        <div class="options">
+            <a href="#" class="action full-html-diff " title="显示html中的不同"><span>html diff</span></a>
+            <a href="#" class="action full-diff  selected" title="显示Markdown编辑的不同"><span>markdown diff</span></a>
+<!--            <a href="/suggested-edits/{{post.id}}" class="action link" title="permalink to this edit suggestion"><span>link</span></a>-->
+        </div>
+    </div>
+    
+    <div class="summary">
+        <div class="revision">
+            <span class="revision-comment" title="comment on this suggested edit">{{summary}}</span>
+        </div>
+	{%if title_diff%}
+	<a href="{{post.get_absolute_url}}" class="question-hyperlink">{{title_diff}}</a>
+	{%if post_type == "tag" %}<hr>{%endif%}
+	{%endif%}
+        <div class="body-diffs">
+	  <!--render diff-->
+	  <table class='full-html-diff dno' style="display:none">
+	    <tbody>
+	      <tr>
+		<td class='post-text'>
+		{%if post_type == "tag" %}
+		{{post.detail|static_content:settings.ANNOUNCEMENT_BAR_RENDER_MODE|safe}}
+		{%else%}
+		{{post.html|safe}}
+		{%endif%}
+		</td>
+		<td class='gutter'> </td>
+		<td class='post-text'>{{render_body_diff|static_content:settings.ANNOUNCEMENT_BAR_RENDER_MODE|safe}} </td>
+	      </tr>
+	    </tbody> 
+	  </table>
+	  <!--markdown diff-->
+	  <table class="full-diff ">
+	    <tbody>
+	      <tr>
+		<td class='post-text'>{{post_text_body|safe}}</td>
+		<td class='gutter'> </td>
+		<td class='post-text'>{{markdown_body_diff}} </td>
+	      </tr>
+	    </tbody> 
+	  </table> 
+
+	</div>
+
+	{%if tags_diff%}
+        <div>
+	  {{tags_diff}}
+        </div>
+	{%endif%}
+
+	<table class="user-info-actions">
+          <tr>
+            <td class="post-signature current-owner">
+              <div class="started">
+		{%if post_type == "tag" %}
+		{% if tag.author%}
+                {% tag_contributors_info post %}		    
+		{%endif%}
+		{%else%}
+                {% contributors_info post %}		    
+		{%endif%}
+              </div>  
+            </td>
+            <td class="gutter"></td>
+            <td class="post-signature suggested-owner">
+              <div class="started">
+                {% suggest_author_info post  %}
+              </div>
+            </td>
+            <td class="actions">
+                <div style="margin-top: 6px" class="post-menu" id="{{post_type}}">
+                    <form>
+                        <input id="{{post_type}}" type="button" class="approve-edit" title="approve this suggested edit" value="接受 " style="margin-right: 8px;" />
+                        <input id="{{post_type}}" type="button" class="reject-edit" title="reject this suggested edit" value="拒绝 " style="margin-right: 8px;" />
+                        <input type="button" class="improve-edit" title="improve this suggested edit" value="改进" />
+                    </form>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <div class="form-error fr"></div>
+            </td>
+        </tr>
+    </table>
+  </div>  
+  <br class="cbt">
+</div>

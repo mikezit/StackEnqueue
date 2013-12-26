@@ -1,0 +1,23 @@
+{% load extra_tags i18n %}
+{% if node.last_edited %}
+<div class="user-info user-hover">
+  <div class="user-action-time">
+    {{ node.last_edited.verb }} <span class="relativetime">{% diff_date node.last_edited.at %}</span>
+  </div>
+  {% ifnotequal node.author node.last_edited.by %}
+  <div class="user-gravatar32">
+	<a href="{{ node.last_edited.by.get_profile_url }}">      
+	  <div class="">
+	    {% gravatar node.last_edited.by 32 %}
+	  </div>
+  </div>
+  <div class="user-details">
+    <a {% if node.last_edited.by.is_suspended %}class="suspended-user" {% endif %}href="{{ node.last_edited.by.get_profile_url }}">{{ node.last_edited.by.decorated_name }}</a><br/>
+    {% get_reputation node.last_edited.by %}
+    {% get_score_badge node.last_edited.by %}
+    {% get_accept_rate node.last_edited.by %}
+  </div>
+</div>
+<br class="cbt">
+ {% endifnotequal %}
+{% endif %}

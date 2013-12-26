@@ -1,0 +1,101 @@
+'use strict';
+StackPointer.suggestedEdits=function(){
+    var g={},
+    find_id=function(a){return $(a).closest(".suggested-edit").attr("id").substring(15)},
+    m=function(a){return $.grep($(a).closest(".suggested-edit").attr("class").split(" "),function(a){return 0===a.indexOf("post-type-id-")})[0].substring(13)},
+    k=function(node,reason,d,b){
+	var id=find_id(node),f=node.closest("form");
+	var suggest_tpye="suggested-edit";
+	if(node.attr("id")=="tag"){
+	    suggest_tpye="tag-suggested-edit"
+	}
+	f.data("working")||
+	    (
+		f.data("working",!0).find("input[type=button]").disable(),
+		StackPointer.helpers.addSpinner(node,{padding:"0 3x"}),
+		$.ajax(
+		    {
+			url:"/{suggesttype}/{editId}/vote/{type}".format({editId:id,type:reason,suggesttype:suggest_tpye}),
+			data:{/*fkey:StackPointer.options.user.fkey,*/reasonId:d,customReason:b},
+			dataType:"json",
+			type:"POST",
+			success:function(b){
+			    b.Success?g.popup?("approve"==reason&&(location.href=b.RedirectTo),$("#lightbox, #lightbox-panel").fadeOutAndRemove()):g.refreshPageOnActionSuccess?location.reload(!0):i(node,b.MiniHtml):j(f,node,b.Message)},
+			error:function(){j(f,node,"在提交的时候发生了一个错误，请重试！")},
+			complete:StackPointer.helpers.removeSpinner
+		    })
+	    )
+    },
+    
+    i=function(a,e){a.closest(".suggested-edit").fadeOut("slow",
+function(){e&&$(".suggested-edit:first").before(e).fadeIn("fast");$(this).remove()});n()},
+    n=function(){$("#hlinks-nav .mod-flag-indicator.hotbg, #tabs .youarehere .mod-flag-indicator.hotbg").each(function(){var a=$(this);a.text((a.text()||0)-1);1>a.text()&&a.hide()})},
+    j=function(a,e,d){
+	StackPointer.helpers.removeSpinner();
+	a.find("input[type=button]").not(e).fadeOut("fast");
+	e.fadeOut("fast",function(){
+	    g.hideRefreshButton||$('<input type="button" class="refresh-button" onclick="location.reload(true)" value="刷新页面" style="display:none">').appendTo(a).fadeIn("fast");
+	    a.closest("table").find(".form-error").html(d).fadeIn("fast",function(){if(g.popup){var b=a.closest(".popup-suggested-edit");0<b.scrollTop()&&b.scrollTop(b.find(".suggested-edit").height())}})
+	})
+    },
+    l=function(a){
+	g=a||{};
+	$(".approve-edit").unbind("click").click(function(){k($(this),"approve");return!1});
+	$(".reject-edit").unbind("click").click(function(){
+	    // var a=$(this),d=find_id(a),b=m(a),c=$("#rejection-prototype").clone(!1).addClass("popup");c.find("input[name=post-type-id]").filter("[value!="+b+"]").closest("li").remove();
+	    // var c=c.find("*").each(function(){
+	    // 	this.id&&(this.id+="-"+d);
+	    // 	var a=this.getAttribute("for");
+	    // 	a&&this.setAttribute("for",a+"-"+d)
+	    // }).end().find(".popup-submit").disable().end().appendTo($(this).closest("#content")).center().css("z-index","2000").fadeIn("fast"),f=c.find(".popup-submit");
+	    // c.find(".static-reason").change(function(){f.enable()});
+	    // c.find(".custom-reason-text").helpOverlay().normalizeRadioTextareaBehaviour().charCounter({min:20,max:150,setIsValid:function(a){a?f.enable():f.disable()}});
+	    // c.find(".popup-close a, .popup-actions-cancel").click(function(){
+	    // 	c.fadeOut("fast",function(){c.remove()});return!1
+	    // });
+	    // c.submit(function(){c.fadeOut("fast",function(){c.remove()});k(a,"reject",c.find("input:radio[name=rejection-reason]:checked").val(),c.find(".custom-reason-text").val());return!1});
+	    // return!1
+	    k($(this),"reject");return!1 // we just reject it at this time
+	});
+	$(".improve-edit").unbind("click").click(function(){
+	    var posttype = $(this).closest(".post-menu").attr('id')
+	    window.window.location.href="/"+posttype+"s/"+$(this).closest(".suggested-edit").find(".post-id").text()+"/edit/?improve=true";return!1
+	});
+	$(".suggested-edit .action:not(.link)").unbind("click").click(function(){
+	    var a=$(this),d=a.hasClass("full-diff")? "full-diff":"full-html-diff",
+	    b=a.closest(".suggested-edit").find(".body-diffs");
+	    b.find("table:visible").hide();
+	    b.find("."+d).show();
+	    a.siblings(".action.selected").removeClass("selected");
+	    a.addClass("selected");
+	    //$.post("/users/save-preference",{key:71,value:"full-diff"===d?"SideBySideMarkdown":"SideBySideHtml",fkey:StackPointer.options.user.fkey});return!1
+	});
+	//StackPointer.vote&&StackPointer.vote.delete_init(function(a,d,b){b&&b.Success?i(a):(d=b&&b.Message?b.Message:"A problem occurred during deletion",a.parent().showErrorPopup(d))})
+    };
+    return{
+	init:l,
+	loadPopup:function(a){
+	    if(!a.data("working")){
+		StackPointer.helpers.addSpinner(a.data("working",!0),{padding:"3px 0"})
+		var e=a.parent(),d=a.attr("id").substring(13);
+		$.ajax({
+		    type:"GET",
+		    url:"/suggested-edits/popup/"+d,
+		    dataType:"html",
+		    success:function(a){
+			var a=$('<div id="lightbox-panel" class="popup" style="display:block"><div class="popup-close"><a title="close this popup (or hit Esc)">&times;</a></div><div class="popup-suggested-edit">'+a+"</div></div>"),
+			c=$(window).height();
+			a.find(".popup-suggested-edit").css({"max-height":c-100});
+			$('<div id="lightbox"/>').appendTo($("body")).css("height",$(document).height()).fadeIn("fast");
+			a.appendTo(e).center().fadeIn("fast").find(".popup-close").click(function(){$("#lightbox, #lightbox-panel").fadeOutAndRemove()});
+			l({popup:!0})},
+		    error:function(a){
+			StackPointer.helpers.showErrorPopup(e,a.responseText&&200>a.responseText.length?a.responseText:"无法处理请求，请稍后再试！")
+		    }, 
+		    complete:function(){
+			StackPointer.helpers.removeSpinner();
+			a.removeData("working")}
+		});
+		return!1}}
+    }
+}();

@@ -1,0 +1,24 @@
+{% extends "sidebar/fixed_slider.html"%}
+{% load markup %}
+{% load i18n general_sidebar_tags %}
+{% block scontent %}
+<div class="newask module" id="title_side_bar">
+    <p class="subtitle darkred">{% trans "Title Tips" %}</p>
+      <h4>标签维基是什么?</h4>
+      <p>
+        标签的<b>简要描述</b>是一段简要介绍这个标签是表示什么的文字.
+      </p>
+      <p>
+        标签的<b>详细描述</b>是有关标签的更详细的介绍,可以是下面一些内容:
+      </p>
+      <div class="list-item">
+	<ul>
+	  <li>什么样的问题可以使用这个标签?</li>
+	  <li>一些关于标签基本的解释</li>
+	  <li>对有关标签主题的简要介绍</li>
+	  <li>一些更为详细介绍网站的链接</li>
+      </ul>
+      </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+<!-- template header.html -->
+{% load extra_tags ui_registry i18n extra_filters markup %}
+
+<div id="top-block"> 
+  <div id="top-block-context"> 
+    <div id="portalLink">
+      <a class="genu" href="void(0);" onclick="showMore();return false;">栈 问 » </a>
+    </div>
+    <div id="searchBar">
+      <form action="{% url search %}" method="get">
+        <div>
+	  <!--value="{{ keywords }}"--> 
+          <input type="text" class="searchInput"  placeholder="探寻栈问" tabindex="1" name="q" id="keywords"  />
+        </div>
+        <div class="options">
+          <input id="type-question" type="radio" value="question" name="t" 
+                 checked="checked" /><label for="type-question">{% trans "questions" %}</label>
+          <input id="type-tag" type="radio" value="tag" name="t" /><label for="type-tag">{% trans "tags" %}</label>
+          <input id="type-user" type="radio" value="user" name="t" /><label for="type-user">{% trans "users" %}</label>
+        </div> 
+      </form>	
+    </div>
+    <div id="top">
+      {% loadregistry header_links %}<span class="topsep">|</span>{% endloadregistry %} 
+    </div>
+  </div>
+</div>
+
+<div id="roof">
+  
+  <div id="logo">
+    <a href="{% url index %}" style="background-image:url({{ settings.APP_LOGO }})">
+<!--      <img id="logoImg" src="{{ settings.APP_LOGO }}" title="{% trans "back to home page" %}" alt="{{settings.APP_TITLE}} logo"/>-->
+    </a>
+  </div>
+  <div id="hmenus">
+    <div class="nav mainnavs">
+      <ul>
+	{% loopregistry page_top_tabs %}{% spaceless %}
+	<li>
+	  <a id="nav_{{ tab_name }}"{% ifequal tab tab_name %}{% if not is_home_page %} class="on"     {% endif %}{% endifequal %} href="{{ tab_url }}" >{{ tab_title }}</a>
+	</li>
+	{% endspaceless %}{% endloopregistry %}
+      </ul>
+    </div>
+    <div class="nav askquestion">
+      <a id="nav_ask" href="{% url ask %}" class="special">{% trans "ask a question" %}</a>
+    </div>
+  </div>
+</div>
+
+  <div class="clear"></div>
+  {% if settings.USE_ANNOUNCEMENT_BAR|or_preview:request %}
+  <div id="announcement">
+    {{ settings.ANNOUNCEMENT_BAR|or_preview:request|static_content:settings.ANNOUNCEMENT_BAR_RENDER_MODE }}
+  </div>
+  {% endif %}
+
+<!-- end template header.html -->

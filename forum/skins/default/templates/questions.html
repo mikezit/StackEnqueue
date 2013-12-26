@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+<!-- questions.html -->
+{% load question_list_tags %}
+{% load i18n %}
+{% load extra_tags %}
+{% load general_sidebar_tags %}
+
+{% block title %}{% spaceless %}{{ page_title }}{% endspaceless %}{% endblock %}
+
+{% block meta %}
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ feed_url }}" />
+{% endblock %}
+
+{% block content %}
+<div class="subheader">
+    {% include "question_list/title.html" %}
+<!--    <a class="feed-icon" style="background-image:url('{ media "media/images/feed-icon-small.png" %}');" href="{{ feed_url }}" title="{% trans "subscribe to question RSS feed" }"></a>-->
+    {{ questions.paginator.sort_tabs }}
+</div>
+{% if tag %}
+<div class="welovestackpointer" style="margin-top: 10px;"> 
+  <div style="float: left;"> 
+    {% if not tag.about%}
+    <p>wiki里面还没有对 <a href="/tags/{{ tag.name }}" class="post-tag" title="{% trans "see questions tagged" %} '{{ tag.name }}'" rel="tag">{% spaceless %}{%if tag.sponsor_tag_img %}<img src="{{tag.sponsor_tag_img}}" height="16" width="18" alt class="sponsor-tag-img" >{%endif%}{{ tag.name }}{% endspaceless %}</a> 的描述。
+      {% if request.user.is_authenticated and not tag.suggested%}
+      您能帮我们<a href="/tag/{{tag.id}}/edit">编辑它么?</a>
+      {% endif %}
+    </p>
+    {% else %}
+    <p>{{ tag.about }}</p>
+    {% endif %}
+    <p style="margin-bottom: 0;"> 
+      <a title="tag wiki" href="/tag/{{tag.id}}/info">详细&hellip;</a> 
+<!--      <span class="lsep">|</span> 
+      <a title="top answerers and askers in this tag" href="/tags/windows-server-2008-r2/topusers">top users</a> 
+      <span class="lsep">|</span> 
+      <a title="common, alternate spellings or phrasings for this tag" href="/tags/windows-server-2008-r2/synonyms">synonyms (1)</a> 
+-->
+    </p> 
+
+  </div> 
+</div> 
+{% endif %}
+<div id="listA" style="margin-bottom:10px" class="question-list">
+  {% for question in questions.paginator.page %}
+  {% if is_home_page %}
+   {%if not question.closed%}
+    {% user_question_list_item question %}
+   {%endif%}
+  {% else %}
+    {% question_list_item question %}
+  {% endif%}
+  {% endfor %}
+</div>
+{% if is_home_page %}
+
+<h4 style="color:#222;font-size:130%;">还想查看更多的问题? 那么请浏览<a href="/questions">完整的问题列表</a>,或者<a href="/tags">受欢迎的标签</a>。帮助我们回答<a href="questions/unanswered">还没有被回答的问题</a>。</h4>
+{% endif %}
+
+{% endblock %}
+
+{% block tail %}
+  {% if not is_home_page %}
+    <div class="pager">{{ questions.paginator.page_numbers }}</div>
+    <div class="pagesize">{{ questions.paginator.page_sizes }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+<!--    { sidebar_upper } -->
+{% tag_selector %}
+<!--    { recent_things } -->
+<!--    { sidebar_lower } -->
+{% question_list_related_tags questions.paginator.page %}
+
+{% endblock %}
+<!-- end questions.html -->
+<!--    { include "question_list/count.html" }-->

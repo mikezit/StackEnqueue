@@ -1,0 +1,7 @@
+{% spaceless %}
+<div class="post-text">
+    {% if title %}<h1>{{ title }}</h1>{% endif %}
+    {% if html %}<div class="text">{{ html }}</div>{% endif %}
+    {% if tags %}{{tags}}{% endif %}
+</div>
+{% endspaceless %}
